@@ -1,0 +1,49 @@
+/* The tips CSS */
+.text-list-with-markers{
+
+}
+.text-title{
+	padding: 1%;
+	background: rgba(0, 0, 0, 0.67);
+	border-radius: 5px;
+	color: #ffffff;
+	margin: unset;
+	font-size: 20px;
+}
+.top-horizontol{
+	width: 95%;
+	margin: auto;
+	padding: 1%;
+}
+.top-horizontol > h1{
+	padding: 1%;
+	background: rgba(0, 0, 0, 0.67);
+	border-radius: 5px;
+	margin: 2%;
+	color: #ffffff;
+	font-size: 35px;
+}
+.bottom-horizontol{
+
+}
+.left-vertical{
+
+}
+.rigth-vertical{
+
+}
+.text{
+	text-align: left;
+	font-size: 20px;
+}
+.text-wrapper{
+	background: #fff;
+	padding: 1%;
+	margin: 2%;
+}
+.big{
+	width: 80%;
+}
+.small{
+	width: 20%;
+}

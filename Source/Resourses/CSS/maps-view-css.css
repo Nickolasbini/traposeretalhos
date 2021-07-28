@@ -1,0 +1,170 @@
+/* The map search options */
+.master-div{
+	display: flex;
+}
+.left-options{
+	display: flex;
+	flex-direction: column;
+	width: 30%;
+	margin-right: 30px;
+	background: #FFFFFF;
+	margin-left: 1%;
+}
+.left-options>*{
+	background: #FFFFFF;
+}
+.right-options{
+	width: 80%;
+}
+#real-time-map{
+	width: 100%;
+	height: 400px;
+}
+.search-icon{
+	width: 5%;
+}
+.waze-searcher-hidder{
+	position: absolute;
+	width: 100%;
+	background: gray;
+}
+/* the left side*/
+.left-filter-top{
+	background: rgba(0, 0, 0, 0.67);
+	color: #ffffff;
+	height: 40px;
+	border-radius: 5px;
+}
+/* the right side*/
+.upper-filter{
+	display: flex;
+	width: 100%;
+	height: 40px;
+	margin-bottom: 15px;
+	background: #FFFFFF;
+	justify-content: space-between;
+	border-radius: 5px;
+}
+/* the km meters at pannel */
+.distance-meter{
+	display: flex;
+	justify-content: space-around;
+}
+.km-calculator{
+	width: 50px;
+	height: 20px;
+	border-radius: 5px;
+	text-align: center;
+	border: 0.2px solid #C4C4C4;
+	margin-right: 5px !important;
+}
+.km-simbol{
+	margin: unset;
+	margin-top: 4px;
+	color: #C4C4C4;
+}
+.km-wrapper{
+	display: flex;
+}
+/* right menu top, filter and search bar */
+.upper-filter>h5{
+	width: auto;
+	margin: auto;
+}
+.upper-filter>select{
+	border: 1px solid #C4C4C4;
+	height: 30px;
+	border-radius: 5px;
+	width: 20%;
+	margin: auto;
+	-moz-appearance: none; /* for Firefox */
+	-webkit-appearance: none;/* for Chrome */
+}
+.upper-filter>select::-ms-expand {
+    display: none;/* For IE10 */
+}
+.upper-filter>input{
+	border: 1px solid #C4C4C4;
+	height: 25px;
+	border-radius: 5px;
+	width: 60%;
+	margin: auto;
+}
+/* related to the map */
+.map{
+	height: 100%;
+	width: 100%;
+}
+.map-wrapper{
+	width: 99%;
+}
+
+/* The divider */
+.divider{
+	width: 100%;
+	height: 1px;
+	background: #C4C4C4;
+	margin-left: 0!important;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+/* km meters slider */
+.slidecontainer {
+    width: 80%; /* Width of the outside container */
+    margin: auto;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+/* The slider itself */
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 5px; /* Specified height */
+    background: rgba(218, 221, 90, 0.78); /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+    border-radius: 5px;
+}
+/* Mouse-over effects */
+.slider:hover {
+	    opacity: 1; /* Fully shown on mouse-over */
+}
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background: rgba(218, 221, 90, 0.78); /* Green background */
+    cursor: pointer; /* Cursor on hover */
+	border-radius: 10px;
+}
+.slider::-moz-range-thumb {
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background: rgba(218, 221, 90, 0.78); /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    border-radius: 10px;
+}
+/* role related css*/
+.roles-options{
+	display: flex;
+	flex-direction: column;
+}
+.option-of-role{
+	margin: 5%;
+}
+/* Best professional announcement */
+.best-professional-group{
+	background: #F0F0F0;
+}
+.professional-card{
+
+}
+.professional-data{
+	
+}

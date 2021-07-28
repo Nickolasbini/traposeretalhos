@@ -1,0 +1,112 @@
+/* The modal CSS */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 5; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    overflow: hidden;
+}
+/* Modal Content/Box */
+.content-of-modal{
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 5%;
+    border: 1px solid #888;
+    width: 80%;
+}
+/* The Close Button */
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    left: 85%;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.modal-header{
+    margin-top: -5%;
+}
+.modal-data{
+    overflow: auto;
+    margin-bottom: 8%;
+    max-height: 60%;
+}
+@media only screen and (max-height: 500px) {
+    .modal-data{
+        height: 150px;
+    }
+}
+/* The options from the modal such as its buttons */
+.modal-options{
+    display: inline-flex;
+    float: right;
+    width: 20%;
+    justify-content: space-between;
+    font-size: 20px;
+}
+
+.left-text{
+    text-align: left;
+}
+.center-text{
+    text-align: center;
+}
+.right-text{
+    text-align: right;
+}
+
+/* custom CSS of modal content */
+.row{
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    margin: auto;
+    padding: 5%;
+}
+.row>input{
+    border-radius: 5px;
+}
+
+/* the confirmation or cancel buttons */
+.modal-options{
+    display: flex;
+    justify-content: right;
+    margin: auto;
+    margin-top: 10%;
+}
+.modal-options a{
+    margin: 15px 5px 0 5px;
+}
+.modal-options-buttons{
+    text-decoration: none;
+    width: auto;
+    margin: auto;
+    border: 1px solid #dddd;
+    border-radius: 5px;
+    padding: 5%;
+    font-size: 20px;
+}
+.modal-options-buttons:hover{
+    transition: 0.5s;
+    color: #ffffff;
+    background: rgba(218, 221, 90, 0.78);
+}
+.safe:hover{
+    background: #00D084!important;
+    transition: 0.5s;
+}
+.danger:hover{
+    background: #D00000!important;
+    transition: 0.5s;
+}

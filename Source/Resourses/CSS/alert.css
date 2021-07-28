@@ -1,0 +1,124 @@
+/* Set a style for all buttons */
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+button:hover {
+  opacity:1;
+}
+
+/* Float cancel and delete buttons and add an equal width */
+.confirmation-buttons{
+    width: 30%;
+    border-radius: 5px;
+    font-size: 20px;
+    margin-left: 8%;
+    margin-right: 8%;
+}
+
+/* Add a color to the cancel button */
+.cancelbutton {
+  background-color: #ccc;
+  color: black;
+}
+.cancelbutton:hover{
+    background: #acaaaa;
+    transition: 0.5s;
+}
+
+/* Add a color to the delete button */
+.confirmbutton {
+  background-color: ##04AA6D;
+}
+.confirmbutton:hover{
+  background: #00D084;
+  transition: 0.5s;
+}
+
+/* Add padding and center-align text to the container */
+.container {
+  padding: 16px;
+  text-align: center;
+}
+
+/* The Modal (background) */
+.confirmation-modal{
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  padding-top: 50px;
+}
+
+/* Modal Content/Box */
+.confirmation-modal-content {
+  background-color: #f4f4f4;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 60%; /* Could be more or less, depending on screen size */
+  border-radius: 5px;
+}
+
+/* Style the horizontal ruler */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+ 
+/* The Modal Close Button (x) */
+.confirmation-modalclose {
+  position: absolute;
+  right: 35px;
+  top: 15px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #f1f1f1;
+}
+
+.confirmation-close:hover,
+.confirmation-close:focus {
+  color: #f44336;
+  cursor: pointer;
+}
+
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.overlay{
+    z-index: -1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: #88898c94;
+    position: fixed;
+}
+
+/* Change styles for cancel button and delete button on extra small screens */
+@media screen and (max-width: 400px) {
+    .confirmation-modal-content{
+        width: 80%;
+    }
+    .clearfix{
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .confirmation-buttons{
+        width: 100%;
+    }
+}
