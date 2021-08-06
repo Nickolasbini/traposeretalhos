@@ -320,25 +320,25 @@ class FunctionsClass extends DataLayer
 			return false;
 		$url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='.$latitude.'&longitude='.$longitude.'&localityLanguage='.$_SESSION['userLanguage'];
 		$ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $answer = curl_exec($ch);
-        if(curl_errno($ch))
-            return null;
-        $answerArray = json_decode($answer, true);
-        if(is_null($answerArray))
-        	return null;
-        // sets user Country
-        if(array_key_exists('countryCode', $answerArray))
-        	$_SESSION['userCountry'] = $answerArray['countryCode'];
-        // sets user City
-        if(array_key_exists('city', $answerArray))
-        	$_SESSION['userCity'] = mb_strtolower($answerArray['city']);
-        // set user State
-        if(array_key_exists('principalSubdivision', $answerArray))
-        	$_SESSION['userState'] = mb_strtolower($answerArray['principalSubdivision']);
-        return true;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$answer = curl_exec($ch);
+		if(curl_errno($ch))
+		    return null;
+		$answerArray = json_decode($answer, true);
+		if(is_null($answerArray))
+			return null;
+		// sets user Country
+		if(array_key_exists('countryCode', $answerArray))
+			$_SESSION['userCountry'] = $answerArray['countryCode'];
+		// sets user City
+		if(array_key_exists('city', $answerArray))
+			$_SESSION['userCity'] = mb_strtolower($answerArray['city']);
+		// set user State
+		if(array_key_exists('principalSubdivision', $answerArray))
+			$_SESSION['userState'] = mb_strtolower($answerArray['principalSubdivision']);
+		return true;
 	}
 
 	// try to fetch user city, country and state by the cookies location, if they exist
@@ -348,9 +348,15 @@ class FunctionsClass extends DataLayer
 			// gathering from better resources
 			FunctionsClass::updateSessionUserLocation($_COOKIE['latitude'], $_COOKIE['longitude']);
 			return true;
-		}else{
+		}else if(isset('userCity'])){
 			// getting by the IP address which is the last resource
-			FunctionsClass::updateSessionUserLocation($_SESSION['userLatitude'], $_SESSION['userLongitude']);
+			// Since it already has the required data on the $_SESSION, try to get the city and set the state by it 
+			$cityName = $_SESSION['userCity'];
+			$cityObj = new City();
+			$city = $cityObj->getCityByName($_SESSION['userCity']);
+			if($city){
+				$_SESSION['userState'] = $city->getState(true)->getName();	
+			}
 			return true;
 		}
 		return null;
