@@ -7,21 +7,13 @@ use Source\Models\PersonalPage;
 use Source\Models\City;
 use Source\Helpers\FunctionsClass;
 
-$app->get('/person/personalpage/identification', function(){
-	echo 'just goes to homepage';
-	// here theres gonna be a method which fetches trhe data about the person
-	header('Location: /'.URL['urlDomain']);
-	exit;
-});
-
 $app->get('/person/personalpage/identification:id', function($id){
 	$personalPageObj = new PersonalPage();
-	$personalPage = $personalPageObj->findById($id);
+	$personalPage = $personalPageObj->findById(base64_decode($id));
 	if(!$personalPage){
 		$_SESSION['viewMessage'] = ucfirst(translate('personal page profile does not exit'));
 		header('Location: /'.URL['urlDomain']);
 	}
-
 	$personRoleObj = new PersonRole();
 	$personRole = $personRoleObj->getPersonByPersonalPage($personalPage->getId());
 	if(is_null($personRole)){

@@ -9,7 +9,8 @@ use CoffeeCode\DataLayer\DataLayer;
  */
 class Company extends DataLayer
 {
-	
+	const BASE_URL = 'company/personalpage/identification';
+
 	function __construct()
 	{
 		parent::__construct('companies', ['companyName','companySlogan', 'score'], 'id', false);
@@ -30,8 +31,8 @@ class Company extends DataLayer
 	public function setScore($score){
 		$this->score = $score;
 	}
-	public function setCompanyLogo($companyLogo){
-		$this->companyLogo = $companyLogo;
+	public function setLogoWebPath($logoWebPath){
+		$this->logoWebPath = $logoWebPath;
 	}
 	// GETTERS
 	public function getId(){
@@ -47,27 +48,27 @@ class Company extends DataLayer
 		return $this->companyURL;
 	}
 	public function getScore(){
-		return $this->region;
+		return $this->score;
 	}
-	public function getCompanyLogo(){
-		return $this->region;
+	public function getLogoWebPath(){
+		return $this->logoWebPath;
 	}
-
-
 
 	/**
-     * Returns an array containing all data of country 
+     * Returns an array containing all data of Company 
      * @version 1.0 - 20210418
      * @return <array> of person data 
      */
 	public function getFullData()
 	{
 		$response = [
-			'id' 		  => $this->getId(),
-			'name' 		  => $this->getName(),
-			'alphaCode2'  => $this->getAlphaCode2(),
-			'alphaCode3'  => $this->getAlphaCode3(),
-			'region' 	  => $this->getRegion()
+			'id' 		    => $this->getId(),
+			'logoWebPath' 	=> $this->getLogoWebPath(),
+			'companyName'   => $this->getCompanyName(),
+			'companySlogan' => $this->getCompanySlogan(),
+			'companyURL' 	=> $this->getCompanyURL(),
+			'score' 	    => $this->getScore(),
+			'document' 	    => $this->getDocument(),
 		];
 		return $response;
 	}

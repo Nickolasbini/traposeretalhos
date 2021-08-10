@@ -8,6 +8,8 @@ use Source\Models\language;
 use Source\Models\City;
 use Source\Models\PersonRole;
 use Source\Models\PersonalPage;
+use Source\Models\Company;
+use Source\Models\CompanyUnit;
 use DOMDocument;
 use Source\Helpers\FunctionsClass;
 
@@ -393,12 +395,44 @@ class Person extends DataLayer
 				$rolesOfPeople[$role['id']] = [];
 			}
 		}
+		$personRoleObj = new PersonRole();
+		$companyUnitObj = new CompanyUnit();
+		$companiesInserted = [];
 		foreach($personObjArray as $person){
-			$rolesOfPeople[$person->getHasRole()][] = [
+			$personRole = $personRoleObj->getPersonRoleByPerson($person->getId());
+			if(is_null($personRole))
+				continue;
+			$elements = [
 				'latitude'  => $person->getLatitude(),
 				'longitude' => $person->getLongitude(),
 				'url'		=> PERSONALPAGE::BASE_URL.base64_encode($person->getId())
 			];
+			$personalPageObj = $personRole->getPersonalPage(true);
+			if(is_null($personalPageObj))
+				continue;
+			if(is_null($personalPageObj->getCompanyUnit())){
+				// Is a service offer
+				$elements['title'] = $person->getFullName();
+				$elements['description'] = $person->getPersonDescription();
+				$elements['logo'] = $person->getProfilePhoto(true);
+				$elements['score'] = $personRole->getScore();
+				$elements['role'] = $personRole->getRole();
+				$elements['isCompany'] = false;
+			}else{
+				// Is a company
+				$companyUnitId = $personalPageObj->getCompanyUnit();
+				if(!in_array($companyUnitId, $companiesInserted)){
+					$companiesInserted[] = $companyUnitId;
+					// $elements['title'] = $comp
+					// Gather data of the company,and flag it with something for the front to see 
+					$responseOfCompany = $companyUnitObj->gatherCompaniesData($companyUnitId);
+					$elements['isCompany'] = true;
+					$elements = array_merge($responseData, $elements);
+				}else{
+					continue;
+				}
+			}
+			$rolesOfPeople[$person->getHasRole()][] = $elements;
 		}
 		return $rolesOfPeople;
 	}

@@ -86,6 +86,7 @@
 	var latitudeCookie  = "<?= isset($_COOKIE['latitude'])  ? $_COOKIE['latitude']  : '' ?>";
 	var longitudeCookie = "<?= isset($_COOKIE['longitude']) ? $_COOKIE['longitude'] : '' ?>";
 	$(document).ready(function(){
+		feedRoleIconArray();
 		// create map with all data needed, current location with marker and professionals
 		// from around
 		if(latitudeCookie == '' || longitudeCookie == ''){
@@ -129,6 +130,7 @@
 	var professionalsMarker = [];
 	var rolesToNotDisplay = null;
 	var currentLocation = {};
+	var markerColors = {1: 'red', 2: 'blue', 3: 'green', 4: 'purple', 5: 'yellow'};
 	function initMap(loadMarkers = null){
 		// checking if it has cookies
 		if(latitudeCookie != '' && longitudeCookie != ''){
@@ -152,15 +154,34 @@
 
 			if(loadMarkers == true){
 				if(professionalsMarker.length > 0){
-					for(i = 0; i < professionalsMarker.length; i++){
-						new google.maps.Marker({
-						    position: {
+					var infowindow = new google.maps.InfoWindow();
+			        var marker, i;
+			        for (i = 0; i < professionalsMarker.length; i++){
+			        	var colorForMarker = "http://maps.google.com/mapfiles/ms/icons/";
+  						colorForMarker += markerColors[i + 1] + "-dot.png";
+			            marker = new google.maps.Marker({
+			                position: {
 						    	lat: parseFloat(professionalsMarker[i]['latitude']),
 						    	lng: parseFloat(professionalsMarker[i]['longitude'])
 						    },
-						    map,
-						});
-					}
+			                map: map,
+			                animation: google.maps.Animation.DROP,
+			                icon:{
+						        url: colorForMarker
+						    },
+			                title: "<?php echo ucfirst(translate('professional location')); ?>"
+			            });
+			            // change here to send an Object
+			            generateContentForInfoView(professionalsMarker[i].title, professionalsMarker[i].description, professionalsMarker[i].url, professionalsMarker[i].logo, professionalsMarker[i].score, professionalsMarker[i].role)
+			            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+			              return function() {
+			                infowindow.setContent(htmlInfoViewGenerated[i]);
+			                infowindow.open(map, marker);
+			              }
+			            })(marker, i));
+
+			            markersArray.push(marker);
+			        }
 				}
 			}
 			setMapRadiusInRelationToUser(map, userPositionMarker);
@@ -182,57 +203,24 @@
 				navigator.geolocation.getCurrentPosition((loc) => {
 					location.lat = loc.coords.latitude;
 					location.lng = loc.coords.longitude;
-					var currentLocation =  {
-						lat: location.lat,
-						lng: location.lng
-					}
-					// write current position to the map
-					map = new google.maps.Map(document.getElementById('google-map-element'), options);
-					// inserting a marker
-					var userPositionMarker = new google.maps.Marker({
-					    position: currentLocation,
-					    map,
-					});
-
-					new google.maps.Marker({
-					    position: {lat: -25.5908027, lng: -49.3979464},
-					    map,
-					});
-
-					new google.maps.Marker({
-					    position: {lat: -25.5930301, lng: -49.397351},
-					    map,
-					});
-
 					updateLocationCokies(location.lat, location.lng);
+					feedProfessionalsOnMap(location.lat, location.lng);
 				},
 				(err) => {
 					// in case user did not allow the use of its location use the location
 					// gathered from the IP which shall not be accurate
-					map = new google.maps.Map(document.getElementById('google-map-element'), options);
+					updateLocationCokies(location.lat, location.lng);
+					feedProfessionalsOnMap(location.lat, location.lng);
 				})
-				// set the radius on the map for selected meters number
-				setMapRadiusInRelationToUser(map, userPositionMarker);
 			}else{
-				// in case user does not have the possibility of the ask for the location
-				// will use the unacurrate location gathered from IP
-				map = new google.maps.Map(document.getElementById('google-map-element'), options);
-				// inserting a marker
-				var userPositionMarker = new google.maps.Marker({
-				    position: location,
-				    map,
-				});
-				setMapRadiusInRelationToUser(map, userPositionMarker);
+				// in case user did not allow the use of its location use the location
+				// gathered from the IP which shall not be accurate
+				updateLocationCokies(location.lat, location.lng);
+				feedProfessionalsOnMap(location.lat, location.lng);
 			}
 		}
 
 	}
-
-
-	google.maps.event.addListener(google.maps.Marker, 'click', function() {
-		alert('ye');
-        //window.location.href = marker.url;
-    });
 
 	var mapObject = null;
 	var userLocationMarkerObject = null;
@@ -254,9 +242,19 @@
 	$('#distance-meter-start-mark').on('input', function(){
 		radiusInMeters = parseInt($(this).val());
 		radiusInMeters = radiusInMeters * 1000;
-		
+		clearMarkerOnMap();
 		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude);
 	});
+
+	var markersArray = [];
+	// try here to clean map markers
+	function clearMarkerOnMap() {
+		alert('find out how to kill former markers');
+	    for(var i = 0; i < markersArray.length; i++ ){
+	    	markersArray[i].setMap(null);
+	    }
+	    markersArray.length = 0;
+	}
 
 	// think here how to call again just to try to gather the new position
 	$('.reLocateMe').on('click', function(){
@@ -284,7 +282,6 @@
 				  			}
 			  			<?php } ?>
 			  		}
-
 		  		}
 		    },
 		    complete: function(){
@@ -296,6 +293,37 @@
 		    }
 		});
 	}
+
+	/*
+      Generates an array containing <string> html content to be used on the infoView attached to a marker on this position.
+      Obs: must be used on a loop, google maps event listener must receive data this way
+    */
+    var htmlInfoViewGenerated = [];
+    function generateContentForInfoView(title = '', description = '', url = '', logo = '', score = '', role = ''){
+        var htmlInfo =
+            '<div id="content">' +
+            '<div id="siteNotice">' +
+            "</div>" +
+            '<img width=150px src="'+logo+'">' +
+            '<img width=150px src="'+rolesIcon[role - 1]+'">' +
+            '<span style="float: right; margin-top:10%; margin-right:10%;">'+score+'</span>' + 
+            '<h1 id="firstHeading" class="firstHeading">'+title+'</h1>' +
+            '<div id="bodyContent">' +
+            "<p><b>"+title+"</b>, is a "+description+"</p>" +
+            '<p>See my profile <a href="'+url+'" style="text-decoration:none;color:##000">' +
+            "Link: "+url+"</a></p>" +
+            "</div>" +
+            "</div>";
+             htmlInfoViewGenerated.push(htmlInfo);
+        return htmlInfo;
+    }
+
+    var rolesIcon = [];
+    function feedRoleIconArray(){
+    	<?php foreach($roles as $role){ ?>
+    		rolesIcon.push("<?php echo URL['iconsPath'].$role['iconUrl'] ?>");
+    	<?php } ?>
+    }
 
 	function parseToKM(meters){
 		var km = meters / 1000;

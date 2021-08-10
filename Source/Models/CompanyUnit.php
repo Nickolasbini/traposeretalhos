@@ -3,13 +3,13 @@
 namespace Source\Models;
 
 use CoffeeCode\DataLayer\DataLayer;
+use Source\Models\Company;
 
 /**
  * 
  */
 class CompanyUnit extends DataLayer
 {
-	
 	function __construct()
 	{
 		parent::__construct('companyUnits', ['company','country', 'country', 'unitName'], 'id', false);
@@ -39,8 +39,8 @@ class CompanyUnit extends DataLayer
 	public function setScore($score){
 		$this->score = $score;
 	}
-	public function setUnitURL($unitURL){
-		$this->unitURL = $unitURL;
+	public function setUnitWebSiteURL($unitWebSiteURL){
+		$this->unitWebSiteURL = $unitWebSiteURL;
 	}
 	public function setIsCompanyHeadquarter($isCompanyHeadquarter){
 		$this->isCompanyHeadquarter = $isCompanyHeadquarter;
@@ -52,7 +52,11 @@ class CompanyUnit extends DataLayer
 	public function getId(){
 		return $this->id;
 	}
-	public function getCompany(){
+	public function getCompany($asObject = false){
+		if($asObject){
+			$companyObj = (new Company())->findById($this->company);
+			return $companyObj;
+		}
 		return $this->company;
 	}
 	public function getCountry(){
@@ -73,30 +77,59 @@ class CompanyUnit extends DataLayer
 	public function getScore(){
 		return $this->score;
 	}
-	public function getUnitURL(){
-		return $this->unitURL;
+	public function getUnitWebSiteURL(){
+		return $this->unitWebSiteURL;
 	}
 	public function getIsCompanyHeadquarter(){
 		return $this->isCompanyHeadquarter;
 	}
-	public function getLocation(){
-		return $this->location;
+	public function getLatitude(){
+		return $this->latitude;
+	}
+	public function getLongitude(){
+		return $this->longitude;
 	}
 
 	/**
-     * Returns an array containing all data of country 
+     * Returns an array containing all data of companyUnit 
      * @version 1.0 - 20210418
      * @return <array> of person data 
      */
 	public function getFullData()
 	{
 		$response = [
-			'id' 		  => $this->getId(),
-			'name' 		  => $this->getName(),
-			'alphaCode2'  => $this->getAlphaCode2(),
-			'alphaCode3'  => $this->getAlphaCode3(),
-			'region' 	  => $this->getRegion()
+			'id' 		    => $this->getId(),
+			'logoWebPath' 	=> $this->getLogoWebPath(),
+			'companyName'   => $this->getCompanyName(),
+			'companySlogan' => $this->getCompanySlogan(),
+			'companyURL' 	=> $this->getCompanyURL(),
+			'score' 	    => $this->getScore(),
+			'document' 	    => $this->getDocument(),
 		];
 		return $response;
+	}
+
+	// gets company by its unit and return all data related to the company as a whole
+	public function gatherCompaniesData($companyUnitId = null)
+	{
+		$companyUnit = $this->findById($companyUnitId);
+		if(is_null($companyUnit))
+			return null;
+		$company =  $companyUnit->getCompany(true);
+		if(is_null($company))
+			return null;
+		$companyData = $company->getFullData();
+		$elements = [
+			'companyName'   => $companyData['companyName'],
+			'logoWebPath'   => $companyData['logoWebPath'],
+			'companySlogan' => $companyData['companySlogan'],
+			'companyURL'    => $companyData['companyURL'],
+			'companyScore'  => $companyData['score'],
+			'unitName' 		=> $companyUnit->getUnitName(),
+			'unitScore'     => $companyUnit->getScore(),
+			'latitude'		=> $companyUnit->getLatitude(),
+			'longitude'		=> $companyUnit->getLongitude()
+		];
+		return $elements;
 	}
 }

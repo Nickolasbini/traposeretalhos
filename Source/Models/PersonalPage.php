@@ -68,7 +68,7 @@ class PersonalPage extends DataLayer
 	// Create PersonalPage with default configuration and return its id
 	public function createURL($personRoleId = null)
 	{
-		$this->setpageURL(PersonalPage::BASE_URL.$personRoleId);
+		$this->setpageURL(PersonalPage::BASE_URL.base64_encode($personRoleId));
 		$this->setIsTemplate(false);
 		$this->setTemplatePersonalPage(1);
 		$result = $this->save();

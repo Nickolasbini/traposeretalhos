@@ -103,7 +103,7 @@ $app->post('/updatecookies/usergeolocation', function(){
 	setcookie('latitude', $latitude, time() + (86400 * 30), '/');
 	setcookie('longitude', $longitude, time() + (86400 * 30), '/');
 	// fetch on API results from this latitude and longitude to gather data
-	FunctionsClass::updateSessionUserLocationAndRelatedData($latitude, $longitude);
+	FunctionsClass::updateSessionUserLocation($latitude, $longitude);
 	return true;
 });
 
