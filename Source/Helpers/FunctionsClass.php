@@ -213,7 +213,6 @@ class FunctionsClass extends DataLayer
 	    }else{
 	        $ip = $remote;
 	    }
-	    $ip = '177.220.179.85';
 	    $ipData = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=".$ip));    
 	    if($ipData && $ipData->geoplugin_countryName != null){
 	        $result['country']  = $ipData->geoplugin_countryCode;
@@ -348,7 +347,7 @@ class FunctionsClass extends DataLayer
 			// gathering from better resources
 			FunctionsClass::updateSessionUserLocation($_COOKIE['latitude'], $_COOKIE['longitude']);
 			return true;
-		}else if(isset('userCity']) && !isset($_SESSION['userState']) ){
+		}else if(isset($_SESSION['userCity']) && !isset($_SESSION['userState']) ){
 			// getting by the IP address which is the last resource
 			// Since it already has the required data on the $_SESSION, try to get the city and set the state by it 
 			$cityName = $_SESSION['userCity'];

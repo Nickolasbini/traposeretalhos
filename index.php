@@ -100,6 +100,12 @@ $app->post('/language/changeuserlanguage', function(){
 $app->post('/updatecookies/usergeolocation', function(){
 	$latitude  = $_POST['latitude'];
 	$longitude = $_POST['longitude'];
+	$removeCookies = isset($_POST['removeCookies']) ? $_POST['removeCookies'] : null;
+	if(!is_null($removeCookies)){
+		unset($_COOKIE['latitude']);
+		unset($_COOKIE['longitude']);
+		return true;
+	}
 	setcookie('latitude', $latitude, time() + (86400 * 30), '/');
 	setcookie('longitude', $longitude, time() + (86400 * 30), '/');
 	// fetch on API results from this latitude and longitude to gather data

@@ -179,8 +179,6 @@
 			                infowindow.open(map, marker);
 			              }
 			            })(marker, i));
-
-			            markersArray.push(marker);
 			        }
 				}
 			}
@@ -219,7 +217,6 @@
 				feedProfessionalsOnMap(location.lat, location.lng);
 			}
 		}
-
 	}
 
 	var mapObject = null;
@@ -242,23 +239,29 @@
 	$('#distance-meter-start-mark').on('input', function(){
 		radiusInMeters = parseInt($(this).val());
 		radiusInMeters = radiusInMeters * 1000;
-		clearMarkerOnMap();
-		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude);
+		// sets it to empty to force reload of map
+		professionalsMarker = [];
+		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude, true);
 	});
 
-	var markersArray = [];
 	// try here to clean map markers
 	function clearMarkerOnMap() {
-		alert('find out how to kill former markers');
-	    for(var i = 0; i < markersArray.length; i++ ){
-	    	markersArray[i].setMap(null);
-	    }
-	    markersArray.length = 0;
+	    professionalsMarker = [];
 	}
 
 	// think here how to call again just to try to gather the new position
 	$('.reLocateMe').on('click', function(){
-		initMap();
+		$.ajax({
+		  	url: 'updatecookies/usergeolocation',
+		  	type: 'POST',
+		  	data: {removeCookies: removeCookies},
+		  	success: function(result){
+		    	//console.log(result);
+		    },
+		    complete: function(){
+		    	askForLocationAndFeedMap();
+		    }
+		});
 	});
 
 	function feedProfessionalsOnMap(latitude, longitude){

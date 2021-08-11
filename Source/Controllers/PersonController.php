@@ -467,7 +467,6 @@ class PersonController
     public function fetchAllProfessionalOfThisCity()
     {
         $userCity = isset($_SESSION['userCity']) ? $_SESSION['userCity'] : null;
-        $userCity = 'araucaria';
         if(is_null($userCity))
             return null;
         $cityObj = new City();
