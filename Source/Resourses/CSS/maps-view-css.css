@@ -122,7 +122,6 @@
     appearance: none;
     width: 100%; /* Full-width */
     height: 5px; /* Specified height */
-    background: rgba(218, 221, 90, 0.78); /* Grey background */
     outline: none; /* Remove outline */
     opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
     -webkit-transition: .2s; /* 0.2 seconds transition on hover */
@@ -146,10 +145,61 @@
 .slider::-moz-range-thumb {
     width: 15px; /* Set a specific slider handle width */
     height: 15px; /* Slider handle height */
-    background: rgba(218, 221, 90, 0.78); /* Green background */
     cursor: pointer; /* Cursor on hover */
     border-radius: 10px;
 }
+/* The range slider at map distance meter */
+/*Chrome*/
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    input[type='range'] {
+      -webkit-appearance: none;
+    }
+    
+    input[type='range']::-webkit-slider-runnable-track {
+      height: 10px;
+      -webkit-appearance: none;
+      color: rgba(218, 221, 90, 0.78);
+      margin-top: -1px;
+    }
+    
+    input[type='range']::-webkit-slider-thumb {
+      width: 10px;
+      -webkit-appearance: none;
+      height: 10px;
+      cursor: ew-resize;
+      background: green;
+      box-shadow: -80px 0 0 80px rgba(0, 0, 0, 0.33);
+    }
+
+}
+/** FF*/
+input[type="range"]::-moz-range-progress {
+    background-color: rgba(218, 221, 90, 0.78);
+}
+input[type="range"]::-moz-range-track {  
+  background-color: rgba(0, 0, 0, 0.33);
+}
+/* IE*/
+input[type="range"]::-ms-fill-lower {
+  background-color: rgba(218, 221, 90, 0.78); 
+}
+input[type="range"]::-ms-fill-upper {  
+  background-color: rgba(0, 0, 0, 0.33);
+}
+
+/* Map legend */
+.map-legend > li {
+    display: inline-block;
+    /* You can also add some margins here to make it look prettier */
+    zoom:1;
+    *display:inline;
+    /* this fix is needed for IE7- */
+}
+.map-legend-item > div{
+	width: 15px;
+	height: 15px;
+}
+
 /* role related css*/
 .roles-options{
 	display: flex;

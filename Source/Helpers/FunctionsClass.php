@@ -285,7 +285,9 @@ class FunctionsClass extends DataLayer
 	                'description'    => $role->getDescription(),
 	                'iconUrl'        => $role->getIconUrl(),
 	                'dateOfCreation' => FunctionsClass::formatDate($role->getDateOfCreation()),
-	                'total'			 => $totalOfProfessionals
+	                'total'			 => $totalOfProfessionals,
+	                'colorOnMap'     => $role->getColorOnMap(),
+	                'isUsedOnMap'	 => $role->getIsUsedOnMap()
 	            ];
 	        }
 	    }

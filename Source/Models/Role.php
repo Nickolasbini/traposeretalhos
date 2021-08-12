@@ -28,6 +28,12 @@ class Role extends DataLayer
 	public function setDateOfCreation($dateOfCreation){
 		$this->dateOfCreation = $dateOfCreation;
 	}
+	public function setColorOnMap($colorOnMap){
+		$this->colorOnMap = $colorOnMap;
+	}
+	public function setIsUsedOnMap($isUsedOnMap){
+		$this->isUsedOnMap = $isUsedOnMap;
+	}
 
 	// GETTERS
 	public function getId(){
@@ -44,6 +50,12 @@ class Role extends DataLayer
 	}
 	public function getDateOfCreation(){
 		return $this->dateOfCreation;
+	}
+	public function getColorOnMap(){
+		return $this->colorOnMap;
+	}
+	public function getIsUsedOnMap(){
+		return $this->isUsedOnMap;
 	}
 
 	/**
@@ -68,7 +80,8 @@ class Role extends DataLayer
 			'roleName'       => $this->getRoleName(),
 			'description'    => $this->getDescription(),
 			'iconURL' 	     => $this->getIconURL(),
-			'dateOfCreation' => $this->getDateOfCreation()
+			'dateOfCreation' => $this->getDateOfCreation(),
+			'colorOnMap'	 => $this->getColorOnMap()
 		];
 		return $response;
 	}

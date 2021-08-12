@@ -8,7 +8,7 @@
 			<h5 style="margin-bottom: 4%; margin-left: 10px;"><?php echo ucfirst(translate('distance')); ?></h5>
 			<div class="distance-meter">
 				<div class="km-wrapper">
-					<input id="distance-meter-start-mark" class="km-calculator" type="number" value="0" placeholder="0">
+					<input id="distance-meter-start-mark" class="km-calculator" type="number" value="1" placeholder="1">
 					<h6 class="km-simbol">Km</h6>
 				</div>
 				<div class="km-wrapper">
@@ -17,7 +17,26 @@
 				</div>				
 			</div>
 			<div class="slidecontainer">
-			    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+				<!--<div style="display: flex;justify-content: space-between;">
+					<span>1</span><span>20</span><span>45</span><span>70</span><span>100</span>
+				</div>
+				<div style="display: flex;justify-content: space-between;">
+					<span>|</span><span>|</span><span>|</span><span>|</span><span>|</span>
+				</div-->
+			    <input type="range" min="1" max="100" value="0" class="slider" id="myRange" list="kilometers-list">
+			    <!--<datalist id="kilometers-list">
+				  <option value="0" label="0 km"></option>
+				  <option value="10"></option>
+				  <option value="20"></option>
+				  <option value="30"></option>
+				  <option value="40"></option>
+				  <option value="50" label="50 km"></option>
+				  <option value="60"></option>
+				  <option value="70"></option>
+				  <option value="80"></option>
+				  <option value="90"></option>
+				  <option value="100" label="100 km"></option>
+				</datalist>-->
 			</div>
 			
 			<div class="divider"></div>
@@ -64,6 +83,15 @@
 			<div class="map-wrapper">
 		 		<div id="google-map-element"></div>
 			</div>
+
+			<div class="map-legend">
+				<?php foreach($roles as $role){ if(!$role['isUsedOnMap']){ continue; } ?>
+					<li class="map-legend-item">
+						<div style="background: <?= $role['colorOnMap'] ?>;"></div>
+						<a><?php echo ucfirst(translate($role['roleName'])) ?></a>
+					</li>
+	  			<?php } ?>
+			</div>
 		</div>
 	</section>
 
@@ -80,8 +108,6 @@
 	<?php $this->insert('user-footer') ?>
 </body>
 <link href="Source/Resourses/CSS/maps-view-css.css" rel="stylesheet"></link>
-
-<script src="Source/Resourses/JS-functions/google-map.js"></script>
 <script>
 	var latitudeCookie  = "<?= isset($_COOKIE['latitude'])  ? $_COOKIE['latitude']  : '' ?>";
 	var longitudeCookie = "<?= isset($_COOKIE['longitude']) ? $_COOKIE['longitude'] : '' ?>";
@@ -221,7 +247,7 @@
 
 	var mapObject = null;
 	var userLocationMarkerObject = null;
-	var radiusInMeters = 3000;
+	var radiusInMeters = 1000;
 	// Creates the circle radius on the map accordinally to 'radiusInMeters' variable
 	function setMapRadiusInRelationToUser(map = null, userLocationMarker = null){
 		mapObject = map;
@@ -235,14 +261,6 @@
 		circle.bindTo('center', userLocationMarker, 'position');
 		circle.setOptions({fillColor: "#756b6b", strokeColor: "#756b6b"});
 	}
-
-	$('#distance-meter-start-mark').on('input', function(){
-		radiusInMeters = parseInt($(this).val());
-		radiusInMeters = radiusInMeters * 1000;
-		// sets it to empty to force reload of map
-		professionalsMarker = [];
-		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude, true);
-	});
 
 	// try here to clean map markers
 	function clearMarkerOnMap() {
@@ -320,6 +338,21 @@
              htmlInfoViewGenerated.push(htmlInfo);
         return htmlInfo;
     }
+
+    // Changing the radius distance
+	$("#myRange").change(function(){
+		var newDistance = $(this).val();
+	    $('#distance-meter-start-mark').val(newDistance);
+	    radiusInMeters = parseInt(newDistance);
+		radiusInMeters = radiusInMeters * 1000;
+		// sets it to empty to force reload of map
+		professionalsMarker = [];
+		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude, true);
+	});
+
+	$('#myRange').on('mouseover', function(){
+	    
+	});
 
     var rolesIcon = [];
     function feedRoleIconArray(){
@@ -472,4 +505,22 @@
 	#google-map-element {
 	    height: 500px;
 	}
+
+	.km-calculator{
+		pointer-events: none;
+		opacity: 0.8;
+	}
+
+/*
+	input[type="range"]::-moz-range-track {
+	    padding: 0 10px;
+	    background: repeating-linear-gradient(to right, 
+	    #ccc, 
+	    #ccc 10%, 
+	    #000 10%, 
+	    #000 11%, 
+	    #ccc 11%, 
+	    #ccc 20%);
+	}
+*/
 </style>
