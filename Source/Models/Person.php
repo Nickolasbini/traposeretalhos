@@ -5,6 +5,7 @@ namespace Source\Models;
 use CoffeeCode\DataLayer\DataLayer;
 use Source\Models\Country;
 use Source\Models\language;
+use Source\Models\State;
 use Source\Models\City;
 use Source\Models\PersonRole;
 use Source\Models\PersonalPage;
@@ -94,6 +95,9 @@ class Person extends DataLayer
 	public function setLongitude($longitude){
 		$this->longitude = $longitude;
 	}
+	public function setState($state){
+		$this->state = $state;
+	}
 
 	// GETTERS
 	public function getId(){
@@ -177,6 +181,13 @@ class Person extends DataLayer
 	public function getLongitude(){
 		return $this->longitude;
 	}
+	public function getState($asObjetc = false){
+		if($asObjetc){
+			$stateObj = (new State())->findById($this->state);
+			return $stateObj;
+		}
+		return $this->state;
+	}
 
 	public function getFullName()
 	{
@@ -246,6 +257,27 @@ class Person extends DataLayer
      */
     public function getCEPData($cep)
     {
+    	// using another web site
+    	$url = 'https://viacep.com.br/ws/'.$cep.'/json/';
+    	$ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $answer = curl_exec($ch);
+        $answerArray  =json_decode($answer, true);
+        if(curl_errno($ch) || is_null($answerArray)){
+        	return null;
+        }
+        $response = [
+        	'cep' 		   => $answerArray['cep'],
+        	'streetName'   => $answerArray['logradouro'],
+        	'neighborhood' => $answerArray['bairro'],
+        	'cityName'     => $answerArray['localidade'],
+        	'stateCode'    => $answerArray['uf']
+        ];
+		return $response;
+
+
         $baseRequestURL = "http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaCepEndereco.cfm";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $baseRequestURL);
@@ -383,10 +415,19 @@ class Person extends DataLayer
 		return $personObjArray;
 	}
 
+	public function getByStateAndRole($stateId = null, $hasRole = true)
+	{
+		$hasRole = $hasRole ? 'is not null' : 'is null';
+		$personObjArray = $this->find("state = :stateId AND hasRole $hasRole", "stateId=$stateId")->fetch(true);
+		return $personObjArray;
+	}
+
 	/* parses personObjects by role
+	*  @param <array> the person objects array to gather role and data of professional
+	*  @param <array> wiht the id(s) of role to be gathered 
 	// @return <array> with key as current roles in the system and with the latitude and longitude of found person  
 	*/
-	public function parseAsEachRoleWithCoordinates($personObjArray = [])
+	public function parseAsEachRoleWithCoordinates($personObjArray = [], $onlyThisRoles = [])
 	{
 		$rolesOfPeople = [];
 		if(file_exists('Source/Files/roles.txt')){
@@ -400,7 +441,7 @@ class Person extends DataLayer
 		$companiesInserted = [];
 		foreach($personObjArray as $person){
 			$personRole = $personRoleObj->getPersonRoleByPerson($person->getId());
-			if(is_null($personRole))
+			if(is_null($personRole) || (!empty($onlyThisRoles) && !in_array($personRole->getRole(), $onlyThisRoles)) )
 				continue;
 			$elements = [
 				'latitude'  => $person->getLatitude(),

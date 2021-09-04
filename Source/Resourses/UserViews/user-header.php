@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
-	<title><?php echo $title ?></title>
+	<title>Trapos e Retalhos - <?php echo $title ?></title>
 
 	<!-- importing jquery -->
 	<script src="Source/Resourses/External/jquery/jquery-3.5.1.js"></script>
@@ -19,6 +19,21 @@
 <header>
 	<nav id="top-navigation-bar">
 		<div class="user-menu-options">
+			<div class="sorting banner option">
+				<div class="sort right">
+					<label>
+						<span class="pointer"><img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
+					    <select class="language-selector">
+
+							<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
+							<option id="en"><?php echo ucfirst(translate('english')); ?></option>
+							<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
+						</select>
+		    		</label>
+		    	</div>
+		    </div>
+
+
 			<div class="banner-option"  title="<?php echo ucfirst(translate('select your language')) ?>">
 			<img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg">
 			<select class="language-selector">
@@ -68,9 +83,6 @@
 			    </li>
 			    <li id="new" title="<?php echo ucfirst(translate('see the latest posts')) ?>">
 			    	<a href="news"><?php echo ucfirst(translate('news')); ?></a>
-			    </li>
-			    <li id="search" title="<?php echo ucfirst(translate('search for categories')) ?>">
-			    	<a href="search"><?php echo ucfirst(translate('search')); ?></a>
 			    </li>
 			    <li id="map" title="<?php echo ucfirst(translate('search on the real time map')) ?>">
 			    	<a href="map"><?php echo ucfirst(translate('map')); ?></a>
@@ -128,7 +140,6 @@
 		var languageToBeSelected = $('#'+userLanguage).text();
 		$('#'+userLanguage).parent().val(languageToBeSelected).change();
 	}
-
 </script>
 
 <style type="text/css">
@@ -168,6 +179,7 @@
 	.language-selector{
 		border: none;
 		background: #F5F4F4;
+		padding-left: 25px;
 	}
 	.language-selector {
 	  -moz-appearance: none; /* for Firefox */
@@ -282,4 +294,46 @@
 		color: #ffffff;
 		background: rgba(218, 221, 90, 0.78);
 	}
+
+
+
+
+
+
+
+	select{
+  -webkit-appearance:none;
+    appearance:none;
+      -moz-appearance:none;
+}
+.sorting{
+	background: none;
+height: 30px;
+padding-left: 25px;
+}
+.sorting h4{
+	padding:4px 0 0;
+	margin:0;
+}
+.sort{
+	position:relative;	
+	padding-left:10px;
+  float:left;
+}
+.sort>label{
+	font-weight:normal !important
+}
+.sort span.pointer{
+	width: 50%;
+	position: absolute;
+	left: 0;
+	margin-left: -20px;
+}
+.sort span.pointer i{
+	margin-top:6px;
+}
+.sorting select{
+
+	height:30px;
+}
 </style>

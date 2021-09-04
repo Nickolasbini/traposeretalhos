@@ -5,6 +5,8 @@ use Source\Helpers\FunctionsClass;
 $app->get('/search', function(){
 	$isLogged = FunctionsClass::isPersonLoggedIn();
 	$personObj = new Person();
+
+	exit(json_encode($_SESSION));
 	if($isLogged){
 		$person = $personObj->findById($_SESSION['personId']);
 		$location = $person->getCity(true)->getCoordinates();

@@ -6,6 +6,7 @@ use Source\Helpers\FunctionsClass;
 use Source\Models\Language;
 use Source\Models\Country;
 use Source\Models\Person;
+use Source\Models\State;
 use Source\Models\City;
 use Source\Models\PersonRecoveryData;
 use Source\Support\Mail;
@@ -464,7 +465,7 @@ class PersonController
 
     // get location of personObjects which possess a role accordinally to session city 
     // used to gather professionals from the selected city
-    public function fetchAllProfessionalOfThisCity()
+    public function fetchAllProfessionalOfThisCity($onlyThisRoles = [])
     {
         $userCity = isset($_SESSION['userCity']) ? $_SESSION['userCity'] : null;
         if(is_null($userCity))
@@ -479,7 +480,31 @@ class PersonController
         if(is_null($people)){
         	return null;
         }
-        $elementsArray = $personObj->parseAsEachRoleWithCoordinates($people);
+        $elementsArray = $personObj->parseAsEachRoleWithCoordinates($people, $onlyThisRoles);
+        return json_encode([
+        	'success' => true,
+        	'message' => ucfirst(translate('professionals fetched with success')),
+        	'content' => $elementsArray
+        ]);
+    }
+
+    public function fetchAllProfessionalOfThisState($onlyThisRoles = [])
+    {
+    	$userState = isset($_SESSION['userState']) ? $_SESSION['userState'] : null;
+    	$userState = 'parana';
+        if(is_null($userState))
+            return null;
+        $stateObj = new State();
+        $state = $stateObj->getStateByName($userState);
+        if(!$state)
+            return null;
+        $stateId = $state->getId();
+        $personObj = new Person();
+        $people = $personObj->getByStateAndRole($stateId);
+        if(is_null($people)){
+        	return null;
+        }
+        $elementsArray = $personObj->parseAsEachRoleWithCoordinates($people, $onlyThisRoles);
         return json_encode([
         	'success' => true,
         	'message' => ucfirst(translate('professionals fetched with success')),
