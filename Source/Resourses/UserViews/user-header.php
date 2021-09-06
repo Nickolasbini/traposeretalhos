@@ -19,29 +19,18 @@
 <header>
 	<nav id="top-navigation-bar">
 		<div class="user-menu-options">
-			<div class="sorting banner option">
+			<div class="sorting" title="<?php echo ucfirst(translate('select your language')) ?>">
 				<div class="sort right">
 					<label>
-						<span class="pointer"><img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
-					    <select class="language-selector">
-
-							<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
-							<option id="en"><?php echo ucfirst(translate('english')); ?></option>
-							<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
+				    <select class="language-selector">
+								<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
+								<option id="en"><?php echo ucfirst(translate('english')); ?></option>
+								<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
 						</select>
-		    		</label>
-		    	</div>
-		    </div>
-
-
-			<div class="banner-option"  title="<?php echo ucfirst(translate('select your language')) ?>">
-			<img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg">
-			<select class="language-selector">
-				<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
-				<option id="en"><?php echo ucfirst(translate('english')); ?></option>
-				<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
-			</select>
-			</div>
+	    	    <span class="pointer"><img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
+    			</label>
+    		</div>
+    	</div>
 			<ul class="user-menu-list">
 				<?php if(isset($_SESSION['personId'])){ ?>
 				<li title="<?php echo ucfirst(translate('my favorites menu')) ?>">
@@ -178,8 +167,6 @@
 	/* The selector related CSS */
 	.language-selector{
 		border: none;
-		background: #F5F4F4;
-		padding-left: 25px;
 	}
 	.language-selector {
 	  -moz-appearance: none; /* for Firefox */
@@ -295,45 +282,47 @@
 		background: rgba(218, 221, 90, 0.78);
 	}
 
-
-
-
-
-
-
+	/* Language selector icon */
 	select{
-  -webkit-appearance:none;
-    appearance:none;
+	    -webkit-appearance:none;
+	    appearance:none;
       -moz-appearance:none;
-}
-.sorting{
-	background: none;
-height: 30px;
-padding-left: 25px;
-}
-.sorting h4{
-	padding:4px 0 0;
-	margin:0;
-}
-.sort{
-	position:relative;	
-	padding-left:10px;
-  float:left;
-}
-.sort>label{
-	font-weight:normal !important
-}
-.sort span.pointer{
-	width: 50%;
-	position: absolute;
-	left: 0;
-	margin-left: -20px;
-}
-.sort span.pointer i{
-	margin-top:6px;
-}
-.sorting select{
-
-	height:30px;
-}
+	}
+	.sorting{
+			padding:5px 10px;
+			clear:both;
+	}
+	.sorting h4{
+			padding:4px 0 0;
+			margin:0;
+	}
+	.sort{
+			position:relative;	
+			padding-left:10px;
+		  float:left;
+	}
+	.sort>label{
+			font-weight:normal !important
+	}
+	.sort span.pointer{
+			height:30px;
+			width:30px;
+			position:absolute;
+			right:0;
+			top:0;
+			text-align:center;
+			color:#c49633;
+			font-size:20px;
+			z-index:1;
+	}
+	.sort span.pointer i{
+			margin-top:6px;
+	}
+	.sorting select{
+			padding:5px 40px 5px 10px !important;
+			background:none;
+			height:30px;
+			position:relative;
+			z-index:2;
+	}
 </style>
