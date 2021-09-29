@@ -4,7 +4,7 @@ namespace Source\Models;
 
 use CoffeeCode\DataLayer\DataLayer;
 use Source\Models\Country;
-use Source\Models\language;
+use Source\Models\Language;
 use Source\Models\State;
 use Source\Models\City;
 use Source\Models\PersonRole;

@@ -4,6 +4,11 @@
 	<div class="post-title">
 		<?php echo ucfirst(translate('news')) ?>
 	</div>
+	<?php 
+		if(count($posts) == 0){
+			echo '<h2>'.$message.'</h2>';
+		}
+	?>
 	<?php foreach($posts as $post){ ?>
 	<div class="post-card" data-post-id="<?= $post['postId'] ?>">
 		<div class="post-card-first-level">
@@ -470,7 +475,9 @@
 		font-size: 25px;
 	}
 	.post-card{
-		margin: 10% 0 10% 0;
+		width: 50%;
+		margin: auto;
+		margin-top: 5%;		
 	}
 	.post-card-first-level{
 		display: flex;
@@ -478,6 +485,7 @@
 		margin: auto;
 		padding: 2%;
 		background: rgba(255, 255, 255, 0.94);
+		border-radius: 15px 15px 0 0;
 	}
 	.section-vertical-wrapper{
 		display: flex;
@@ -577,6 +585,7 @@
 		padding: 2%;
 		margin: auto;
 		background: rgba(255, 255, 255, 0.94);
+		border-radius: 0 0 15px 15px;
 	}
 	.comments-of-people{
 		width: 100%;
@@ -717,6 +726,17 @@
 		to {
 			background-color: yellow;
 		}
+	}
+
+	@media only screen and (max-width: 600px) {
+	    .post-card{
+	    	width: 90%!important;
+	    }
+	}
+	@media only screen and (max-width: 1400px) {
+	    .post-card{
+	    	width: 70%;
+	    }
 	}
 </style>
 

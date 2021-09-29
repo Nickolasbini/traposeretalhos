@@ -3,7 +3,6 @@ use Source\Controllers\CountryController;
 use Source\Controllers\PersonController;
 
 $app->get('/map', function(){
-	//exit(json_encode($_SESSION));
 	$roles = file_get_contents('Source/Files/roles.txt');
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
 	echo $userTemplate->render('map', [
