@@ -142,7 +142,9 @@
 				longitudeCookie = <?= $_SESSION['userLongitude'] ?>;
 				updateLocationCokies(location.lat, location.lng);
 				feedProfessionalsOnMap(latitudeCookie, longitudeCookie);
-			})
+			},
+				{maximumAge:10000, timeout:5000, enableHighAccuracy: true}
+			);
 		}else{
 			// in case user does not have the possibility of the ask for the location
 			// will use the unacurrate location gathered from IP
