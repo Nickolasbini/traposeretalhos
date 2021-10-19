@@ -196,6 +196,9 @@
 	.top-user-card-wrapper{
 		display: flex;
 		overflow-x: scroll;
+		width: 90%;
+		margin: auto;
+		margin: 0 2% 0 2%;
 	}
 	.top-user-card{
 		padding: 2%;
@@ -236,12 +239,14 @@
 	}
 	.current-professionals-data > h4{
 		text-align: center;
-		font-size: 30px;
+		font-size: 2.5em;
 	}
 	.professionals-data{
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-around;
+		width: 80%;
+		margin: auto;
 	}
 	.professional-card{
 		display: flex;
@@ -252,6 +257,11 @@
 		width: 300px;
 		height: 300px;
 		margin: 2%;
+		cursor: pointer;
+	}
+	.professional-card:hover{
+		transition: 0.2s;
+		transform: scale(1.1);
 	}
 	.professionals-number{
 		text-align: right;

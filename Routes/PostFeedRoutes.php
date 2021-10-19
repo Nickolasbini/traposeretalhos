@@ -31,7 +31,6 @@ $app->get('/category/save', function(){
 });
 
 $app->post('/post/save', function(){
-	exit('ma');
 	$postCt = new PostController();
 	$parameters = [
 		'id'			  => isset($_POST['id']) 			  ? $_POST['id'] : null,
@@ -39,8 +38,6 @@ $app->post('/post/save', function(){
 		'postTitle'       => isset($_POST['postTitle']) 	  ? $_POST['postTitle'] : null,
 		'postDescription' => isset($_POST['postDescription']) ? $_POST['postDescription'] : null
 	];
-	var_dump($_POST['postTitle']);
-	exit;
 	$result = $postCt->save($parameters);
 	exit($result);
 });

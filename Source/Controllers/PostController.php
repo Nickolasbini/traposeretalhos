@@ -190,6 +190,7 @@ class PostController
           $paginator->pager($total, $limit, $page);
           $posts = $postObj->list(null, $paginator->limit(), $paginator->offset());
           $response = [];
+          $message = null;
           if(count($posts) > 1){
                foreach($posts as $post){
                     $personObj = $post->getPerson(true);
@@ -210,11 +211,15 @@ class PostController
                          'roleData' => $personData['hasRole'] ? $personObj->getPersonRole() : null,
                     ];
                }
+          }else{
+               $message = ucfirst(translate('no post'));
           }
+
           return json_encode([
                'success' => true,
                'content' => $response,
-               'page'    => $paginator->render()
+               'page'    => $paginator->render(),
+               'message' => $message
           ]);
      }
 

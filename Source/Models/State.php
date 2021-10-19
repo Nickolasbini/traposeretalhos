@@ -83,4 +83,10 @@ class State extends DataLayer
 		];
 		return $response;
 	}
+
+	public function getStateByName($stateName)
+	{
+		$stateObj = $this->find("name = :stateName", "stateName=$stateName")->limit(1)->fetch();
+		return $stateObj;
+	}
 }

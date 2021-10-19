@@ -58,6 +58,7 @@ button:hover {
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
   padding-top: 50px;
+  z-index: 100;
 }
 
 /* Modal Content/Box */

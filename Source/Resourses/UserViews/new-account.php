@@ -91,7 +91,8 @@
 			</div>
 			<div class="input-wrapper small-input">
 				<label><?php echo ucfirst(translate('CEP')) ?>*</label>
-				<input class="required" type="text">
+				<input id="cep" class="required" type="text">
+				<a id="search-for-cep" class="field-button"><?php echo ucfirst(translate('search')); ?></a>
 			</div>
 			<div class="text-wrapper" style="margin: 5% 0 5% 0;">
 				<label>or</label>
@@ -185,6 +186,21 @@
 	// to gather all data needed
 	$(document).ready(function() {
 
+	});
+
+	$('#cep').on('input', function(){
+		var cep = $(this).val();
+		$.ajax({
+			url: 'trytofindcep',
+			type: 'POST',
+			data: {cep: cep},
+			dataType: 'JSON',
+			success: function(data){
+				if(data.content != null){
+					alert('found something');
+				}
+			}
+		});
 	});
 
 	/* Section one */
@@ -287,7 +303,7 @@
 	}
 	$('#personal-data').on('click', function(){
 		if($(this).hasClass('selected-on-menu') == false){
-			alert('you canto');
+			alert('you can not');
 			return;
 		}
 		if(userRole == null){
@@ -668,5 +684,13 @@
 		height: 500px;
 		margin: auto;
 		margin-bottom: 5%;
+	}
+
+	#search-for-cep{
+		border: 1px solid gray;
+		border-radius: 15px;
+		width: 50%;
+		margin: auto;
+		margin-top: 10%;
 	}
 </style>

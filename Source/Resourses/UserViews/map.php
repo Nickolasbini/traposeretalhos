@@ -23,7 +23,7 @@
 				<div style="display: flex;justify-content: space-between;">
 					<span>|</span><span>|</span><span>|</span><span>|</span><span>|</span>
 				</div-->
-			    <input type="range" min="1" max="100" value="0" class="slider" id="myRange" list="kilometers-list">
+			    <input type="range" min="1" max="100" value="0" class="slider" id="myRange">
 			    <!--<datalist id="kilometers-list">
 				  <option value="0" label="0 km"></option>
 				  <option value="10"></option>
@@ -41,14 +41,17 @@
 			
 			<div class="divider"></div>
 
-			<h4><?php echo ucfirst(translate('What do you seek')); ?>?</h4>
+			<h4><?php echo ucfirst(translate('what do you seek')); ?>?</h4>
 			<div class="roles-options">
 			<?php if(isset($_SESSION['roles'])){
 				$roles = json_decode($_SESSION['roles'], true);
-				foreach($roles as $data){?>
+				foreach($roles as $data){
+					if($data['isUsedOnMap'] != 1)
+						continue;
+					?>
 					<div class="option-of-role">
-					<input class="roleOption" data-id="<?= $data['id'] ?>" data-creation-date="<?= $data['dateOfCreation'] ?>" type="checkbox">
-						<label class="name"><?php echo ucfirst(translate($data['roleName'])); ?></label>
+					<input id="<?= $data['roleName'] ?>" class="roleOption" data-id="<?= $data['id'] ?>" data-creation-date="<?= $data['dateOfCreation'] ?>" type="checkbox">
+						<label class="nameOfRole" for="<?= $data['roleName'] ?>"><?php echo ucfirst(translate($data['roleName'])); ?></label>
 					</div>
 			<?php }} ?>
 			</div>
@@ -56,14 +59,6 @@
 			<div class="best-professional-group">
 				<div class="left-filter-top" style="margin-top: 25px;">
 					<h5 style="margin: 10px 0 0 10px;"><?php echo ucfirst(translate('best professionals')); ?></h5>
-					<div class="professional-card">
-						<img src="">
-						<div class="professional-data">
-							<h5>Victoria</h5>
-							<span><img><img></span>
-							<a href="#">my page</a>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -72,12 +67,12 @@
 			<div class="upper-filter">
 				<h5><?php echo ucfirst(translate('filter by')); ?>:</h5>
 				<select class="filter-map-by">
-					<option>city</option>
-					<option>state</option>
-					<option>country</option>
+					<option value="city">city</option>
+					<option value="state">state</option>
+					<option value="country">country</option>
 				</select>
 				<input id="search-field" type="text" placeholder="<?php echo ucfirst(translate('search')); ?>">
-				<img class="search-icon" src="Source/Resourses/External/icons/search.svg">
+				<img class="search-icon" src="<?= URL['iconsPath']; ?>search.svg">
 			</div>
 
 			<div class="map-wrapper">
@@ -92,19 +87,33 @@
 					</li>
 	  			<?php } ?>
 			</div>
+			<div class="reLocateMe">
+				<div>
+					<img src="<?= URL['iconsPath']; ?>location-marker.svg"><a><?php echo ucfirst(translate('find me')); ?></a>
+				</div>
+			</div>
 		</div>
 	</section>
 
+	<section class="all-professionals-section">
+		<div class="all-professionals-title">
+			<h5>See all our professionals profile</h5>
+		</div>
+		<div class="roles-cards">
+			<?php foreach($roles as $role){ ?>
+				<div class="card-of-role" title="see all">
+					<img src="<?= URL['iconsPath'] . $role['iconUrl']; ?>">
+					<a><?= $role['roleName'] ?></a>
+				</div>
+			<?php } ?>
+		</div>
+	</section>	
+
 	<!-- The place to set the error -->
 	<p id="demo"></p>
-
 	
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBU-TEmfQj4HU2Janr2QIECDF2ciY1HvRY&callback=initMap"></script>
-	<div class="reLocateMe">
-		<a>Find me</a>
-	</div>
-
-
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBU-TEmfQj4HU2Janr2QIECDF2ciY1HvRY"></script>
+	
 	<?php $this->insert('user-footer') ?>
 </body>
 <link href="Source/Resourses/CSS/maps-view-css.css" rel="stylesheet"></link>
@@ -158,6 +167,7 @@
 	var professionalsMarker = [];
 	var rolesToNotDisplay = null;
 	var currentLocation = {};
+	var askIfLocationIsCorrect = null;
 	var markerColors = {1: 'red', 2: 'blue', 3: 'green', 4: 'purple', 5: 'yellow'};
 	function initMap(loadMarkers = null){
 		// checking if it has cookies
@@ -245,6 +255,9 @@
 				feedProfessionalsOnMap(location.lat, location.lng);
 			}
 		}
+		if(askIfLocationIsCorrect == true)
+			openConfirmationAlert();
+		askIfLocationIsCorrect = null;
 	}
 
 	var mapObject = null;
@@ -274,21 +287,48 @@
 		$.ajax({
 		  	url: 'updatecookies/usergeolocation',
 		  	type: 'POST',
-		  	data: {removeCookies: removeCookies},
+		  	data: {removeCookies: true},
 		  	success: function(result){
 		    	//console.log(result);
 		    },
 		    complete: function(){
 		    	askForLocationAndFeedMap();
+		    	askIfLocationIsCorrect = true;
+		    	setTitleAndMessage("<?php echo ucfirst(translate('is this your correct location?')); ?>");
+		    	setButtonsMessage("<?php echo ucfirst(translate('no, it is not')); ?>", "<?php echo ucfirst(translate('yes, it is correct')); ?>");
 		    }
 		});
 	});
 
+	// create this question modal in order to ask person address
+	$('.cancelbutton').on('click', function(){
+		openQuestionModal();
+	});
+	$('.confirmbutton').on('click', function(){
+		closeConfirmationAlert();
+	});
+
+	// triggers new map type accordingly to checkboxes
+	$('.option-of-role').on('click', function(){
+		$(this).toggleClass('wasClicked');
+		if($(this).hasClass('wasClicked') == true)
+			return;
+		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude);
+	});
+
 	function feedProfessionalsOnMap(latitude, longitude){
+		var onlyThisRoles = [];
+		var elementsOfCheckbox = $('.roleOption:checkbox:checked');
+		if(elementsOfCheckbox.length > 0){
+			elementsOfCheckbox.each(function(){
+				onlyThisRoles.push($(this).attr('data-id'));
+			});
+		}
 		$.ajax({
 		  	url: 'person/fetchprofessionalsformap',
 		  	type: 'POST',
 		  	dataType: 'JSON',
+		  	data: {onlyThisRoles: onlyThisRoles},
 		  	success: function(result){
 		  		if(result.success == true){
 			  		content = result.content;
@@ -350,10 +390,6 @@
 		// sets it to empty to force reload of map
 		professionalsMarker = [];
 		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude, true);
-	});
-
-	$('#myRange').on('mouseover', function(){
-	    
 	});
 
     var rolesIcon = [];

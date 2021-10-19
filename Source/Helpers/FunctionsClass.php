@@ -270,8 +270,12 @@ class FunctionsClass extends DataLayer
 
 	public static function getRolesToSession()
 	{
-		if(file_exists(TMPPATH['files'].'roles.txt'))
+		if(isset($_SESSION['roles']))
 			return;
+		if(file_exists(TMPPATH['files'].'roles.txt') && !isset($_SESSION['roles'])){
+			$_SESSION['roles'] = file_get_contents(TMPPATH['files'].'roles.txt');			
+			return;
+		}
 		$roleObj = new Role();
 		$personRoleObj = new PersonRole();
 		$roles = $roleObj->getAllRoles();

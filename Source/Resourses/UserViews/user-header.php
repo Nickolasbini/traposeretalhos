@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
-	<title><?php echo $title ?></title>
+	<title>Trapos e Retalhos - <?php echo $title ?></title>
+	<link rel="icon" type="image/svg" href="Source/Resourses/External/icons/favicon.svg"/>
 
 	<!-- importing jquery -->
 	<script src="Source/Resourses/External/jquery/jquery-3.5.1.js"></script>
@@ -13,20 +15,23 @@
 	<link href="Source/Resourses/CSS/tips-view.css" rel="stylesheet"></link>
 	<link href="Source/Resourses/CSS/modal.css" rel="stylesheet"></link>
 	<link href="Source/Resourses/CSS/alert.css" rel="stylesheet"></link>
-	
 </head>
 
 <header>
 	<nav id="top-navigation-bar">
 		<div class="user-menu-options">
-			<div class="banner-option"  title="<?php echo ucfirst(translate('select your language')) ?>">
-			<img src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg">
-			<select class="language-selector">
-				<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
-				<option id="en"><?php echo ucfirst(translate('english')); ?></option>
-				<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
-			</select>
-			</div>
+			<div class="sorting" title="<?php echo ucfirst(translate('select your language')) ?>">
+				<div class="sort right">
+					<label>
+				    <select class="language-selector">
+							<option id="pt"><?php echo ucfirst(translate('portuguese')); ?></option>
+							<option id="en"><?php echo ucfirst(translate('english')); ?></option>
+							<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
+						</select>
+	    	    <span class="pointer"><img width="30px" src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
+    			</label>
+    		</div>
+    	</div>
 			<ul class="user-menu-list">
 				<?php if(isset($_SESSION['personId'])){ ?>
 				<li title="<?php echo ucfirst(translate('my favorites menu')) ?>">
@@ -55,7 +60,7 @@
 		</div>
 
 		<div class="header-logo">
-			<img src="Source/Resourses/External/icons/logo-line&needle.svg">
+			<img width="15%"  src="Source/Resourses/External/icons/logo-line&needle.svg">
 			<h1><?php echo APP['appName'] ?></h1>
 		</div>
 
@@ -68,9 +73,6 @@
 			    </li>
 			    <li id="new" title="<?php echo ucfirst(translate('see the latest posts')) ?>">
 			    	<a href="news"><?php echo ucfirst(translate('news')); ?></a>
-			    </li>
-			    <li id="search" title="<?php echo ucfirst(translate('search for categories')) ?>">
-			    	<a href="search"><?php echo ucfirst(translate('search')); ?></a>
 			    </li>
 			    <li id="map" title="<?php echo ucfirst(translate('search on the real time map')) ?>">
 			    	<a href="map"><?php echo ucfirst(translate('map')); ?></a>
@@ -128,7 +130,6 @@
 		var languageToBeSelected = $('#'+userLanguage).text();
 		$('#'+userLanguage).parent().val(languageToBeSelected).change();
 	}
-
 </script>
 
 <style type="text/css">
@@ -167,7 +168,6 @@
 	/* The selector related CSS */
 	.language-selector{
 		border: none;
-		background: #F5F4F4;
 	}
 	.language-selector {
 	  -moz-appearance: none; /* for Firefox */
@@ -281,5 +281,49 @@
 		transition: 0.5s;
 		color: #ffffff;
 		background: rgba(218, 221, 90, 0.78);
+	}
+
+	/* Language selector icon */
+	select{
+	    -webkit-appearance:none;
+	    appearance:none;
+      -moz-appearance:none;
+	}
+	.sorting{
+			padding:5px 10px;
+			clear:both;
+	}
+	.sorting h4{
+			padding:4px 0 0;
+			margin:0;
+	}
+	.sort{
+			position:relative;	
+			padding-left:10px;
+		  float:left;
+	}
+	.sort>label{
+			font-weight:normal !important
+	}
+	.sort span.pointer{
+			height:30px;
+			width:30px;
+			position:absolute;
+			right:0;
+			top:0;
+			text-align:center;
+			color:#c49633;
+			font-size:20px;
+			z-index:1;
+	}
+	.sort span.pointer i{
+			margin-top:6px;
+	}
+	.sorting select{
+			padding:5px 40px 5px 10px !important;
+			background:none;
+			height:30px;
+			position:relative;
+			z-index:2;
 	}
 </style>

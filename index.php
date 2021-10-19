@@ -28,6 +28,8 @@ require __DIR__ ."/Routes/PersonRoutes.php";
 require __DIR__ ."/Routes/PostFeedRoutes.php";
 require __DIR__ ."/Routes/MapAndSearchRoutes.php";
 require __DIR__ ."/Routes/ViewsRoutes.php";
+// in case user is not requesting this protocol
+$_SERVER['REQUEST_SCHEME'] = 'https';
 
 $app->get('/', function(){
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
@@ -98,8 +100,8 @@ $app->post('/language/changeuserlanguage', function(){
 
 // set cookies to user current location
 $app->post('/updatecookies/usergeolocation', function(){
-	$latitude  = $_POST['latitude'];
-	$longitude = $_POST['longitude'];
+	$latitude  = isset($_POST['latitude'])  ? $_POST['latitude'] : null;
+	$longitude = isset($_POST['longitude']) ? $_POST['longitude'] : null;
 	$removeCookies = isset($_POST['removeCookies']) ? $_POST['removeCookies'] : null;
 	if(!is_null($removeCookies)){
 		unset($_COOKIE['latitude']);
