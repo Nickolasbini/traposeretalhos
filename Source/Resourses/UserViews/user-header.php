@@ -65,7 +65,8 @@
 		</div>
 
 		<div class="header-items">
-		    <ul class="top-menu-options">
+			<div id="menu-icon-bar" style="display: none;"><i class="fas fa-bars"></i></div>
+		    <ul class="top-menu-options dropdown-menu">
 			    <li id="homepage" title="<?php echo ucfirst(translate('go to the home page')) ?>">
 			    	<a class="homepage-icon" href="<?php echo '/'.URL['urlDomain']; ?>">
 			    		<i class="fas fa-home"></i>
@@ -130,6 +131,12 @@
 		var languageToBeSelected = $('#'+userLanguage).text();
 		$('#'+userLanguage).parent().val(languageToBeSelected).change();
 	}
+
+	
+	  $('#menu-icon-bar').on('click', function(){
+	  	  $(this).toggleClass('menu-bar-oppened');
+	  	  $('.dropdown-menu').toggleClass('opened-dropdown-menu');
+	  });
 </script>
 
 <style type="text/css">
@@ -251,8 +258,10 @@
 		margin: auto;
 	}
 	/* Custom hover effect of the HomePage */
-	#homepage:hover{
-		font-size: 60px;
+	@media only screen and (min-width: 600px){
+		#homepage:hover{
+			font-size: 60px;
+		}
 	}
 
 	/* removing arrows from Number input*/
@@ -325,5 +334,54 @@
 			height:30px;
 			position:relative;
 			z-index:2;
+	}
+
+	@media only screen and (max-width: 600px){
+	  .sort{
+	  	padding-left: 0px;
+	  }
+	  .sorting{
+	  	margin-top: auto;
+			margin-bottom: auto;
+	  }
+	  .user-menu-list{
+	  	margin-right: 5%;
+	  }
+	  .dropdown-menu li{
+	  	display: none;
+	  	height: 50px;
+	  }
+	  .opened-dropdown-menu{
+	  	height: 250px!important;
+	  	flex-direction: column!important;
+	  	justify-content: none;
+	  	height: none;
+	  	padding: 5%;
+	  }
+	  .opened-dropdown-menu li{
+	  	display: block;
+	  }
+	  #menu-icon-bar{
+	  	display: block!important;
+	  	position: absolute;
+			right: 10%;
+			margin-top: 5%;
+	  }
+	  .menu-bar-oppened{
+	  	color: #fff;
+	  	transform: rotate(90deg);
+			transition: 0.2;
+	  }
+	  #menu-icon-bar:hover{
+	  	color: #fff;
+	  	cursor: pointer;
+	  	transition: 0.5s;
+	  }
+	  .homepage-icon > i{
+	  	font-size: 1.5em;
+	  }
+	  .dropdown-menu a{
+	  	font-size: 1.2em !important;
+	  }
 	}
 </style>

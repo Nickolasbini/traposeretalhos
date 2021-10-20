@@ -58,7 +58,7 @@
 		margin-top: 20%;
 	}
 	.footer-logo{
-		background-image: url('Source/Resourses/External/icons/gray-background.jpg');
+		background-image: url('Source/Resourses/External/icons/gray-background.webp');
 		background-repeat: round;
 	}
 	.footer-works-links{

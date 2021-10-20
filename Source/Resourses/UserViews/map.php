@@ -125,7 +125,7 @@
 		// create map with all data needed, current location with marker and professionals
 		// from around
 		if(latitudeCookie == '' || longitudeCookie == ''){
-			askForLocationAndFeedMap();
+		    askForLocationAndFeedMap();
 		}else{
 			feedProfessionalsOnMap(latitudeCookie, longitudeCookie);
 		}
@@ -134,7 +134,7 @@
 	// tries to get location from cookies else asks for the location, if it can't
 	// get the location from the IP which is kind of innacurate
 	function askForLocationAndFeedMap(){
-		if(navigator.geolocation){
+	    if(navigator.geolocation){
 			navigator.geolocation.getCurrentPosition((loc) => {
 				location.lat = loc.coords.latitude;
 				location.lng = loc.coords.longitude;
@@ -184,7 +184,6 @@
 			map = new google.maps.Map(document.getElementById('google-map-element'), options);
 			var userPositionMarker = new google.maps.Marker({
 			    position: location,
-			    icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
 			    map,
 			    animation: google.maps.Animation.DROP,
 			    title: "<?php echo ucfirst(translate('your location')); ?>"
@@ -330,6 +329,8 @@
 		  	dataType: 'JSON',
 		  	data: {onlyThisRoles: onlyThisRoles},
 		  	success: function(result){
+		  	    console.log(result);
+		  	    alert('he');
 		  		if(result.success == true){
 			  		content = result.content;
 			  		// In case all roles are selected
@@ -540,8 +541,11 @@
 	}
 
 	/* google map */
+	.map-wrapper{
+	    height: 800px;
+	}
 	#google-map-element {
-	    height: 500px;
+	    height: 100%;
 	}
 
 	.km-calculator{

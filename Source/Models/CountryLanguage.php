@@ -12,7 +12,7 @@ class CountryLanguage extends DataLayer
 	
 	function __construct()
 	{
-		parent::__construct('countryLanguages', ['country','language'], 'id', false);
+		parent::__construct('countrylanguages', ['country','language'], 'id', false);
 	}
 	// SETTERS
 	public function setCountry($country){

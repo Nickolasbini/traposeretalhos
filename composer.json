@@ -27,6 +27,8 @@
 		"league/plates": "3.*",
 		"phpmailer/phpmailer": "6.0.*",
 		"coffeecode/datalayer": "1.1.*",
-		"coffeecode/paginator": "1.0.*"
+		"coffeecode/paginator": "1.0.*",
+		"larapack/dd": "1.*",
+		"gumlet/php-image-resize": "1.9.*"
 	}
 }

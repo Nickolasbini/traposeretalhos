@@ -1,5 +1,20 @@
 <?php $this->insert('user-header', ['title' => ucfirst(translate('homepage'))]) ?>
 
+<!--
+<iframe src="https://embed.waze.com/iframe?zoom=18&lat=-25.5916948&lon=-49.3986947&pin=1"
+  width="300" height="400"></iframe>
+
+  <iframe src="https://embed.waze.com/iframe?ul?q=595%20Archelau%20de%20Almeida%20Torres"
+  width="300" height="400"></iframe>
+
+<img id="jo" src="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw" target="_blank"> 
+
+<input type="hidden" name="image-url" value="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw">
+
+<img src="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw"/>
+-->
+
+
 <section class="top-user-announcement">
 	<div class="top-user-announcement-wrapper">
 		<div class="title-wrapper">
@@ -177,6 +192,20 @@
 
 <?php $this->insert('user-footer') ?>
 
+<script type="text/javascript">
+	function encodeImgtoBase64(element) {
+      var img = element.files[0];
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        $("#convertImg").attr("href",reader.result);
+        $("#convertImg").text(reader.result);
+        $("#displayImg").attr("src", reader.result);
+      }
+      reader.readAsDataURL(img);
+    }
+
+</script>
+
 <style type="text/css">
 	.top-user-announcement-wrapper{
 		width: 90%;
@@ -198,15 +227,14 @@
 		overflow-x: scroll;
 		width: 90%;
 		margin: auto;
-		margin: 0 2% 0 2%;
 	}
 	.top-user-card{
 		padding: 2%;
 		background: #ffffff;
 		border-radius: 5px;
 		text-align: center;
-		margin-left: 5%;
 		min-width: 200px;
+		margin: 0 1% 0 1%;
 	}
 	.user-personal-page{
 		display: flex;
