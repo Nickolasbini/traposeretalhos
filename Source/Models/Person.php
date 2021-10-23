@@ -338,6 +338,7 @@ class Person extends DataLayer
 			'cityData' 			=> $this->getCity(true)->getFullData(),
 			'name' 				=> $this->getName(),
 			'lastName' 			=> $this->getLastName(),
+			'fullName'			=> $this->getFullName(),
 			'abbreviationName'  => $this->getName().' '.$personNameAbbreviation.'.',
 			'dateOfBirth' 		=> FunctionsClass::formatDate($this->getDateOfBirth()),
 			'sex' 				=> $this->getSex(),
@@ -358,6 +359,10 @@ class Person extends DataLayer
 			'profilePhoto'		=> $this->getProfilePhoto(true),
 			'allPhotos'			=> $this->getProfilePhoto()
 		];
+		if($this->getHasRole()){
+			$response['role'] = $this->getPersonRole();
+		}
+		$elements = $response;
 		return $response;
 	}
 

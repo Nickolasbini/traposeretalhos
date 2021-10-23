@@ -8,8 +8,10 @@ use Source\Models\City;
 use Source\Helpers\FunctionsClass;
 
 $app->get('/person/personalpage/identification:id', function($id){
+
 	$personalPageObj = new PersonalPage();
-	$personalPage = $personalPageObj->findById(base64_decode($id));
+	//$personalPage = $personalPageObj->findById(base64_decode($id));
+	$personalPage = $personalPageObj->findById($id);
 	if(!$personalPage){
 		$_SESSION['viewMessage'] = ucfirst(translate('personal page profile does not exit'));
 		header('Location: /'.URL['urlDomain']);
@@ -25,17 +27,16 @@ $app->get('/person/personalpage/identification:id', function($id){
 		$_SESSION['viewMessage'] = ucfirst(translate('personal page profile unreachable, try again later'));
 		header('Location: /'.URL['urlDomain']);
 	}
-
-	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews/PersonalPages');
+	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
 	$templatePersonalPage = $personalPage->getTemplatePersonalPage();
 	if(!is_null($templatePersonalPage)){
-		echo $userTemplate->render('templatePersonalPage'.$templatePersonalPage, [
+		echo $userTemplate->render('PersonalPages/templatePersonalPage'.$templatePersonalPage, [
 			'person'	 => $personFullData
 		]);
 		exit;
 	}
 
-	echo $userTemplate->render('customPersonalPage', [
+	echo $userTemplate->render('PersonalPages/customPersonalPage', [
 		'customHTML' => $personalPage->getCustomHTML(),
 		'customCSS'  => $personalPage->getCustomCSS(),
 		'person'	 => $personFullData

@@ -4,17 +4,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
 	<title>Trapos e Retalhos - <?php echo $title ?></title>
-	<link rel="icon" type="image/svg" href="Source/Resourses/External/icons/favicon.svg"/>
+	<link rel="icon" type="image/svg" href="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/favicon.svg"/>
 
 	<!-- importing jquery -->
-	<script src="Source/Resourses/External/jquery/jquery-3.5.1.js"></script>
+	<script src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/jquery/jquery-3.5.1.js"></script>
 	<!-- importing FontAwesome -->
-	<link href="Source/Resourses/External/fontawesome/css/all.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/External/fontawesome/css/all.css" rel="stylesheet"></link>
 	<!-- importing CSS -->
-	<link href="Source/Resourses/CSS/general.css" rel="stylesheet"></link>
-	<link href="Source/Resourses/CSS/tips-view.css" rel="stylesheet"></link>
-	<link href="Source/Resourses/CSS/modal.css" rel="stylesheet"></link>
-	<link href="Source/Resourses/CSS/alert.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/CSS/general.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/CSS/tips-view.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/CSS/modal.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/CSS/alert.css" rel="stylesheet"></link>
 </head>
 
 <header>
@@ -28,20 +28,20 @@
 							<option id="en"><?php echo ucfirst(translate('english')); ?></option>
 							<option id="es"><?php echo ucfirst(translate('spanish')); ?></option>
 						</select>
-	    	    <span class="pointer"><img width="30px" src="Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
+	    	    <span class="pointer"><img width="30px" src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/<?php echo $_SESSION['userLanguage'] ?>.svg"></span>
     			</label>
     		</div>
     	</div>
 			<ul class="user-menu-list">
 				<?php if(isset($_SESSION['personId'])){ ?>
 				<li title="<?php echo ucfirst(translate('my favorites menu')) ?>">
-					<img src="Source/Resourses/External/icons/star.svg">
+					<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/star.svg">
 					<a href="favorites"><?php echo ucfirst(translate('favorites')); ?></a>
 				</li>
 				<?php } ?>
 				<?php if(isset($_SESSION['personId'])){ ?>
 					<li title="<?php echo ucfirst(translate('my account information')) ?>">
-						<img src="Source/Resourses/External/icons/account.svg">
+						<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/account.svg">
 						<a href="myaccount"><?php echo ucfirst(translate('my account')); ?></a>
 					</li>
 				<?php } ?>
@@ -60,7 +60,7 @@
 		</div>
 
 		<div class="header-logo">
-			<img width="15%"  src="Source/Resourses/External/icons/logo-line&needle.svg">
+			<img width="15%"  src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/logo-line&needle.svg">
 			<h1><?php echo APP['appName'] ?></h1>
 		</div>
 

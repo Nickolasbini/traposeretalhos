@@ -2,7 +2,7 @@
 	<div class="footer-section-one">
 		<div class="overlay-of-modal" style="display: none;"></div>
 		<div class="header-logo footer-logo">
-			<img width="30px" src="Source/Resourses/External/icons/logo-line&needle.svg">
+			<img width="30px" src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/logo-line&needle.svg">
 			<h1 style="margin-right: 2%"><?php echo APP['appName'] ?></h1>
 			<div class="footer-works-links">
 				<ul class="links-options">
@@ -18,16 +18,16 @@
 		<div class="contact-data">
 			<div class="media-contacts">
 				<a href="" class="contact-icon">
-					<img width="30px" src="Source/Resourses/External/icons/email.svg">
+					<img width="30px" src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/email.svg">
 				</a>
 				<a href="" class="contact-icon">
-					<img width="30px"  src="Source/Resourses/External/icons/whatsapp.svg">
+					<img width="30px"  src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/whatsapp.svg">
 				</a>
 				<a href="" class="contact-icon">
-					<img width="30px"  src="Source/Resourses/External/icons/instagram.svg">
+					<img width="30px"  src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/instagram.svg">
 				</a>
 				<a href="" class="contact-icon">
-					<img width="30px"  src="Source/Resourses/External/icons/facebook.svg">
+					<img width="30px"  src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/facebook.svg">
 				</a>
 			</div>
 			<div class="web-site-signature">
@@ -58,7 +58,7 @@
 		margin-top: 20%;
 	}
 	.footer-logo{
-		background-image: url('Source/Resourses/External/icons/gray-background.webp');
+		background-image: url('/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/gray-background.webp');
 		background-repeat: round;
 	}
 	.footer-works-links{
