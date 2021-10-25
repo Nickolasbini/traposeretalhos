@@ -9,6 +9,8 @@ use Source\Controllers\PersonController;
 use Source\Controllers\PersonRoleController;
 use Source\Helpers\FunctionsClass;
 
+use \Gumlet\ImageResize;
+
 // starts the session
 FunctionsClass::startSession();
 // verifies the existence of authentificationToken cookies
@@ -28,8 +30,6 @@ require __DIR__ ."/Routes/PersonRoutes.php";
 require __DIR__ ."/Routes/PostFeedRoutes.php";
 require __DIR__ ."/Routes/MapAndSearchRoutes.php";
 require __DIR__ ."/Routes/ViewsRoutes.php";
-// in case user is not requesting this protocol
-$_SERVER['REQUEST_SCHEME'] = 'https';
 
 $app->get('/', function(){
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
@@ -119,6 +119,52 @@ $app->post('/updatecookies/usergeolocation', function(){
 $app->post('/systemmessages/clean', function(){
 	unset($_SESSION['messages']);
 	return true;
+});
+
+$app->post('/save/map', function(){
+	$image = isset($_FILES['img']) ? $_FILES['img'] : null;
+	if(is_null($image)){
+		$response = json_encode([
+			'success' => false,
+			'message' => 'no file sent'
+		]);
+		echo $response;
+		return;
+	}
+	$pathToStorage = TMPPATH['images'] . 'professionals-map';
+
+	if(!is_dir($pathToStorage))
+		mkdir($pathToStorage);
+	$fileToSave = $image['tmp_name'];
+	$source = file_get_contents($fileToSave);
+
+	$imageWk = new ImageResize($fileToSave);
+	$image->quality_jpg = 100;
+	$imageWk->crop(200, 200);
+	$result = $imageWk->save('image2.jpg', IMAGETYPE_PNG);
+	dd($result);
+	$fileName = $pathToStorage . '/' . 'professional-map-1848998198.jpeg';
+	file_put_contents($fileName, $source);
+
+	return true;
+});
+
+$app->post('/me/test', function(){
+
+
+	
+	$url = "https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&zoom=18&size=600x300&maptype=roadmap&markers=color:red|label:H|-25.5916169,-49.3966099&key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw";
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	$answer = curl_exec($ch);
+
+	dd(urldecode($answer));
+
+	//file_put_contents('t.png', $answer);
+	exit($answer);
+
+
 });
 
 if(!Midleware::checkLogin()){

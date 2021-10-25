@@ -6,9 +6,13 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Source\\' => array($baseDir . '/source'),
+    'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
+    'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
+    'Symfony\\Component\\VarDumper\\' => array($vendorDir . '/symfony/var-dumper'),
+    'Source\\' => array($baseDir . '/Source'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'League\\Plates\\' => array($vendorDir . '/league/plates/src'),
+    'Gumlet\\' => array($vendorDir . '/gumlet/php-image-resize/lib'),
     'CoffeeCode\\Paginator\\' => array($vendorDir . '/coffeecode/paginator/src'),
     'CoffeeCode\\DataLayer\\' => array($vendorDir . '/coffeecode/datalayer/src'),
 );

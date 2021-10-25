@@ -3,6 +3,7 @@
 namespace Source\Models;
 
 use CoffeeCode\DataLayer\DataLayer;
+use Source\Models\Document;
 
 /**
  * 
@@ -38,6 +39,12 @@ class PersonalPage extends DataLayer
 	public function setQrCode($qrCode){
 		$this->qrCode = $qrCode;
 	}
+	public function setBackgroundPhoto($backgroundPhoto){
+		$this->backgroundPhoto = $backgroundPhoto;
+	}
+	public function setMyWorks($myWorks){
+		$this->myWorks = $myWorks;
+	}
 
 	// GETTERS
 	public function getId(){
@@ -63,6 +70,20 @@ class PersonalPage extends DataLayer
 	}
 	public function getQrCode(){
 		return $this->qrCode;
+	}
+	public function getBackgroundPhoto($asObject = false){
+		if($asObject){
+			$documentObj = (new Document())->findById($this->backgroundPhoto);
+			return $documentObj;
+		}
+		return $this->backgroundPhoto;
+	}
+	public function getMyWorks($asArray = false)
+	{
+		if($asArray){
+			return json_decode($this->myWorks, true);
+		}
+		return $this->myWorks;
 	}
 
 	// Create PersonalPage with default configuration and return its id

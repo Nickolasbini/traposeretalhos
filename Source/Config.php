@@ -76,7 +76,7 @@ function getBaseURLPath()
     $baseURL = explode('/', $url);
     $basePath = '';
     if(is_array($baseURL) && count($baseURL) > 1){
-        $basePath = $baseURL[1];
+        $basePath = $baseURL[0];
     }
     return $basePath;
 }

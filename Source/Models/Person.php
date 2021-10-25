@@ -408,7 +408,9 @@ class Person extends DataLayer
 			'roleDescription'    => $roleData['description'],
 			'roleIconURL'	     => $roleData['iconURL'],
 			'roleDateOfCreation' => $roleData['dateOfCreation'],
-			'personalPageURL'	 => $personalPageObj->getPageURL().$personalPageObj->getId()
+			'personalPageURL'	 => $personalPageObj->getPageURL().$personalPageObj->getId(),
+			'backgroundPhoto'    => $personalPageObj->getBackgroundPhoto(true)->getFullData(),
+			'personalPageId'     => $personalPageObj->getId()
 		];
 		return $responseData;
 	}

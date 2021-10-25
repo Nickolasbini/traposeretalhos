@@ -135,4 +135,16 @@ class Document extends DataLayer
 	{
 		return $this->getWebPath();
 	}
+
+	public function getFullData()
+	{
+		$elements = [
+			'id' 		=> $this->getId(),
+			'directory' => $this->getDirectory(),
+			'path' 		=> $this->getPath(),
+			'name' 		=> $this->getName(),
+			'webPath' 	=> $this->getWebPath(),
+		];
+		return $elements;
+	}
 }

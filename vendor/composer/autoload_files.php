@@ -6,5 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    '24668241886695ca5857a52d0c9ec855' => $baseDir . '/source/Config.php',
+    '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => $vendorDir . '/symfony/polyfill-mbstring/bootstrap.php',
+    'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
+    '667aeda72477189d0494fecd327c3641' => $vendorDir . '/symfony/var-dumper/Resources/functions/dump.php',
+    '0e423a14e27410a071e5d815d3ffc856' => $vendorDir . '/larapack/dd/src/helper.php',
+    '4b77b52bd6f714088611a7ced02be416' => $baseDir . '/Source/Config.php',
 );

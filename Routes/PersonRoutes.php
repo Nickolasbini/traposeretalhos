@@ -2,13 +2,13 @@
 use Source\Controllers\PersonController;
 use Source\Controllers\CityController;
 use Source\Controllers\StateController;
+use Source\Controllers\PersonalPageController;
 use Source\Models\PersonRole;
 use Source\Models\PersonalPage;
 use Source\Models\City;
 use Source\Helpers\FunctionsClass;
 
 $app->get('/person/personalpage/identification:id', function($id){
-
 	$personalPageObj = new PersonalPage();
 	//$personalPage = $personalPageObj->findById(base64_decode($id));
 	$personalPage = $personalPageObj->findById($id);
@@ -173,4 +173,13 @@ $app->post('/person/fetchprofessionalsformap', function(){
 	//$professionals = $personCt->fetchAllProfessionalOfThisCity($onlyThisRoles);
 	echo $professionals;
 	return $professionals;
+});
+
+// get personal page works
+$app->post('/personalpage/getmyworks', function(){
+	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
+	$personalPageCt = new PersonalPageController();
+	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+	echo $myWorks;
+	return $myWorks;
 });
