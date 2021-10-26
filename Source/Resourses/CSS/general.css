@@ -12,14 +12,21 @@ body{
 	padding: 0;
 }
 
-.meddium-text{
-
-}
-
 .centralized{
 	text-align: center;
 }
 
 .left-position{
 	text-align: left;
+}
+
+.gray-border{
+	padding: 5%;
+	border: 1px solid #C4C4C42E;
+	border-radius: 5px;
+	margin: 1%;
+}
+.gray-border:hover{
+	border: 1px solid #C4C4C4;
+	transition: 0.2s;
 }
