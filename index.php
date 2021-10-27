@@ -9,8 +9,6 @@ use Source\Controllers\PersonController;
 use Source\Controllers\PersonRoleController;
 use Source\Helpers\FunctionsClass;
 
-use \Gumlet\ImageResize;
-
 // starts the session
 FunctionsClass::startSession();
 // verifies the existence of authentificationToken cookies
