@@ -1,5 +1,7 @@
 <?php
 
+use Source\Models\Person;
+
 /**
  * 
  */
@@ -7,25 +9,79 @@ class Midleware
 {
 	public static function checkLogin()
 	{
+		// exit(json_encode($_SESSION));
 		$request = $_SERVER['REQUEST_URI'];
 		$request = str_replace('/'.URL['urlDomain'], '', $request);
-		$routesToVerify = ['/post/save'];
+		$routesToVerify = ['/post/save', '/message/listmessages'];
 		foreach($routesToVerify as $routeName){
 			if($request == $routeName){
+				$result = Midleware::tryToLogin();
+
 				if(!isset($_SESSION['personId']) || is_null($_SESSION['personId'])){
 					$_SESSION['errorMessage'] = ucfirst(translate('please log in first'));
-		            return false;
+		            $_SESSION['messages'] = ucfirst(translate('please, log in first'));
+					header('Location: /'.URL['urlDomain'].'/login');
+					exit;
 		      	}
+		      	break;
 			}
 		}
       	return true;
+	}
+
+	/*
+		tries to login by session\cookie\e
+	*/
+	public static function tryToLogin()
+	{
+		$personObj = new Person();
+		// check by session
+		if(isset($_SESSION['personId']) && !is_null($_SESSION['personId'])){
+			$person = $personObj->findById($_SESSION['personId']);
+			if($person && $person->getStatus() != PERSON::NOT_VERIFIED_ACCOUNT){
+				return true;
+			}
+		}
+		// try to find by cookie
+		if(isset($_COOKIE['authenticationToken']) && !is_null($_COOKIE['authenticationToken'])){
+			$person = $personObj->getByAuthenticationToken($_COOKIE['authenticationToken']);
+			if($person && $person->getStatus() != PERSON::NOT_VERIFIED_ACCOUNT){
+				// set session variables
+				FunctionsClass::setPersonSession($person);
+				// set cookie, check how to use this data
+				$authenticationToken = FunctionsClass::setPersonCookie();
+				$person->setAuthenticationToken($authenticationToken);
+				$person->save();
+				return true;
+			}
+		}
+		// try to find by email
+		$email    = isset($_POST['email']) ? $_POST['email'] : null;
+		$password = isset($_POST['password']) ? $_POST['password'] : null;
+		if(!is_null($email) && !is_null($password)){
+			$person = $personObj->getByEmail($email);
+			if($person && $person->getStatus() != PERSON::NOT_VERIFIED_ACCOUNT){
+				$personPassword = $person->getPassword();
+				$password = FunctionsClass::generateHashValue($password);
+				if($personPassword == $password){
+					// set session variables
+					FunctionsClass::setPersonSession($person);
+					// set cookie, check how to use this data
+					$authenticationToken = FunctionsClass::setPersonCookie();
+					$person->setAuthenticationToken($authenticationToken);
+					$person->save();
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	// saves the routes accessed by user
 	public static function saveLastRoute()
 	{
 		// verify here what to use, maybe put just the main routes to be allowed to be saved on the history
-		$recordOnlyThesesRoutes = ['/traposeretalhos/', '/traposeretalhos/news', '/traposeretalhos/search', '/traposeretalhos/map', '/traposeretalhos/tips', '/traposeretalhos/courses', '/traposeretalhos/posts'];
+		$recordOnlyThesesRoutes = ['/traposeretalhos/', '/traposeretalhos/news', '/traposeretalhos/search', '/traposeretalhos/map', '/traposeretalhos/tips', '/traposeretalhos/courses', '/traposeretalhos/posts', '/message/listmessages'];
 		$routes = isset($_SESSION['history']) ? json_decode($_SESSION['history'], true) : [];
 		$currentRoute = $_SERVER['REQUEST_URI'];
 		if(!in_array($currentRoute, $recordOnlyThesesRoutes))
@@ -36,5 +92,11 @@ class Midleware
 			$routes = array_values($routes);
 		}
 		$_SESSION['history'] = json_encode($routes);
+	}
+
+	// check if cookie of login exists, else tries to login
+	public static function verifyLogin()
+	{
+		
 	}
 }

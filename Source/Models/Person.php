@@ -484,4 +484,10 @@ class Person extends DataLayer
 		}
 		return $rolesOfPeople;
 	}
+
+	public function getByAuthenticationToken($authenticationToken)
+	{
+		$personObjArray = $this->find("authenticationToken = :authenticationToken", "authenticationToken=$authenticationToken")->fetch(true);
+		return $personObjArray;
+	}
 }

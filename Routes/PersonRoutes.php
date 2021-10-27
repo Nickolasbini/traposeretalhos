@@ -3,6 +3,7 @@ use Source\Controllers\PersonController;
 use Source\Controllers\CityController;
 use Source\Controllers\StateController;
 use Source\Controllers\PersonalPageController;
+use Source\Controllers\MessageController;
 use Source\Models\PersonRole;
 use Source\Models\PersonalPage;
 use Source\Models\City;
@@ -176,6 +177,35 @@ $app->post('/person/fetchprofessionalsformap', function(){
 });
 
 // get personal page works
+$app->post('/personalpage/getmyworks', function(){
+	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
+	$personalPageCt = new PersonalPageController();
+	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+	echo $myWorks;
+	return $myWorks;
+});
+
+// messages routes
+$app->post('/message/listmessages', function(){
+	if(!FunctionsClass::isPersonLoggedIn()){
+		$_SESSION['messages'] = ucfirst(translate('please, log in first'));
+		header('Location: /'.URL['urlDomain'].'/login');
+		exit;
+	}
+	$messageCt = new MessageController();
+	$myWorks = $messageCt->listMessages();
+	echo $myWorks;
+	return $myWorks;
+});
+
+$app->post('/personalpage/getmyworks', function(){
+	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
+	$personalPageCt = new PersonalPageController();
+	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+	echo $myWorks;
+	return $myWorks;
+});
+
 $app->post('/personalpage/getmyworks', function(){
 	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
 	$personalPageCt = new PersonalPageController();
