@@ -187,29 +187,22 @@ $app->post('/personalpage/getmyworks', function(){
 
 // messages routes
 $app->post('/message/listmessages', function(){
-	if(!FunctionsClass::isPersonLoggedIn()){
-		$_SESSION['messages'] = ucfirst(translate('please, log in first'));
-		header('Location: /'.URL['urlDomain'].'/login');
-		exit;
-	}
 	$messageCt = new MessageController();
 	$myWorks = $messageCt->listMessages();
 	echo $myWorks;
 	return $myWorks;
 });
 
-$app->post('/personalpage/getmyworks', function(){
-	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
-	$personalPageCt = new PersonalPageController();
-	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+$app->post('/message/save', function(){
+	$messageCt = new MessageController();
+	$myWorks = $messageCt->save();
 	echo $myWorks;
 	return $myWorks;
 });
 
-$app->post('/personalpage/getmyworks', function(){
-	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
-	$personalPageCt = new PersonalPageController();
-	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+$app->post('/message/sendmessage', function(){
+	$messageCt = new MessageController();
+	$myWorks = $messageCt->sendMessage();
 	echo $myWorks;
 	return $myWorks;
 });

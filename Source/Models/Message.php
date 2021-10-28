@@ -8,6 +8,7 @@ use Source\Models\Person;
 use DateTime;
 use Source\Models\MessageFile;
 use Source\Models\Document;
+use Source\Helpers\FunctionsClass;
 
 class Message extends DataLayer
 {
@@ -23,7 +24,7 @@ class Message extends DataLayer
 
     public function setId($id)
     {
-        $this->id($id);
+        $this->id = $id;
     }
 
     public function getOwnerOfMessage($asObject = false)
@@ -37,7 +38,7 @@ class Message extends DataLayer
 
     public function setOwnerOfMessage($personId)
     {
-        $this->ownerOfMessage($personId);
+        $this->ownerOfMessage = $personId;
     }
 
     public function getDateOfMessage($format = null)
@@ -94,38 +95,41 @@ class Message extends DataLayer
         $this->messageText = $messageText;
     }
 
-    // returns an array of documentObj with this message
-    public function getMessageFiles($messageId)
+    public function getFatherMessage($asObject = false)
     {
-        if(!$messageId)
-            return [];
-        $messageFilesObj = new MessageFile();
-        $messageFiles = $messageFilesObj->getByMessageId($messageId, true);
-        if(!$messageFiles)
-            return [];
-        return $messageFiles;
+        if($asObject){
+            $fatherMessageObj = (new Message())->findById($this->fatherMessage);
+            return $fatherMessageObj;
+        }
+        return $this->fatherMessage;
+    }
+
+    public function setFatherMessage($messageId)
+    {
+        $this->fatherMessage = $messageId;
+    }
+
+    // returns an array of documentObj with this message
+    public function getMessageFile($asObject = null)
+    {
+        if($asObject){
+            $documentObj = (new Document)->findById($this->messageFile);
+            return $documentObj;
+        }
+        return $this->messageFile;
     }
 
     /*
-        creates Document obj and link it to messageFile Obj 
-        param <array> of images object
+        creates Document obj and link it
         try to return the id
     */
-    public function setMessageFile($filesArray = null)
+    public function setMessageFile($fileObj)
     {
-        if(!$filesArray || !is_array($filesArray))
+        if(!$fileObj)
             return null;
         $documentObj = new Document();
-        $response = null;
-        foreach($filesArray as $file){
-            // first create Document obj
-
-            $messageFileObj = new MessageFile();
-            $messageFileObj->setMessage($this->getId());
-            $messageFileObj->setDocument($result['id']);
-            
-            $response = $messageFileObj->save();
-        }
+        $documentIds = $documentObj->saveDocuments();
+        $response = $this->messageFile = $documentIds[0];
         return $response;
     }
 
@@ -136,22 +140,29 @@ class Message extends DataLayer
     public function getByPerson($personId, $total = null, $limit = null, $offset = null)
     {
         // addapt to be paginated
-        $messageObj = 'where ownerOfMessage = $personId or targetPerson = $personId';
+        if($total){
+            $messageObj = $this->find("ownerOfMessage = :personId or targetPerson = :personId", "personId=$personId")->count();
+        }else{
+            $messageObj = $this->find("ownerOfMessage = :personId or targetPerson = :personId", "personId=$personId")->limit($limit)->offset($offset)->fetch(true);
+        }
         return $messageObj;
     }
 
-    // get by owner
-    public function getByOwner($ownerId)
+    /*
+        checks if there is already a message like parameters
+    */
+    public function verifyExistence($ownerOfMessageId = null, $targetPersonId = null)
     {
-        $messageObj = 'where ownerOfMessage = $ownerId';
-        return $messageObj;
+        $messageObj = $this->find("(ownerOfMessage = :ownerOfMessageId and targetPerson = :targetPersonId) or (ownerOfMessage = :targetPersonId and targetPerson = :ownerOfMessageId)",
+            "ownerOfMessageId=$ownerOfMessageId&targetPersonId=$targetPersonId")->fetch(true);
+        return $messageObj ? $messageObj[0] : null;
     }
 
     // maybe will not use this method
     // try to find a created message between both people
     // return the object if found a occorence
     // @param 'firstResult' means the first message to be initiated, on false gets the more recent
-    public function verifyExistence($parameters, $firstResult = true){
+    public function verifyExistenceOld($parameters, $firstResult = true){
         $ownerOfMessageId = $parameters['ownerOfMessage'];
         $targetPersonId   = $parameters['targetPerson'];
         $messageObj = 'where (ownerOfMessage = $ownerOfMessageId and targetPerson = $targetPersonId) || (ownerOfMessage = $targetPersonId and targetPerson = $ownerOfMessageId)';
@@ -161,41 +172,5 @@ class Message extends DataLayer
             // order by dateOfMessage ASC
         }
         return $messageObj;
-    }
-
-
-
-    /**
-     * convert date string to dateTime object
-     * Obs: enter a date string in ISO or Y-m-d format
-     * @param	<string> $dateString
-     * @return DateTime|null
-     */
-    public static function convertDateStringToDateTimeObject($dateString)
-    {
-        if(is_null($dateString)){
-            return null;
-        }
-        
-        try{
-            $dateTime = new DateTime($dateString);
-            return $dateTime;
-        }catch(Exception $e){
-            return null;
-        }
-    }
-
-    /**
-     * convert dateTime object to dateIso
-     * @param	<DateTime> $dateTime
-     * @return string|null
-     */
-    public static function convertDateTimeObjectToDateIso($dateTime)
-    {
-        if($dateTime instanceof DateTime){
-            return $dateTime->format(DateTime::ISO8601);
-        }else{
-            return null;
-        }
     }
 }
