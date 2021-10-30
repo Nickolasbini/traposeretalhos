@@ -1,0 +1,34 @@
+{
+	"name": "nickolas/traposeretalhos",
+	"description": "Web aplication of a marketing place for seewing services",
+	"minimum-stability": "stable",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Nickolas A. Bini",
+			"email": "nickolasbini@hotmail.com",
+			"role": "Developer",
+			"homepage": "https://nciwebsolutions.com.br"
+		}
+	],
+	"config": {
+		"vendor-dir": "vendor"
+	},
+	"autoload": {
+		"psr-4": {
+			"Source\\": "Source/"
+		},
+		"files": [
+			"Source/Config.php"
+		]
+	},
+	"require" : {
+		"slim/slim":"2.0",
+		"league/plates": "3.*",
+		"phpmailer/phpmailer": "6.0.*",
+		"coffeecode/datalayer": "1.1.*",
+		"coffeecode/paginator": "1.0.*",
+		"larapack/dd": "1.*",
+		"gumlet/php-image-resize": "1.9.*"
+	}
+}
