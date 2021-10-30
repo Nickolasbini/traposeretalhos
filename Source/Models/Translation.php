@@ -15,7 +15,8 @@ class Translation extends DataLayer
 		parent::__construct('translations', ['baseWord'], 'id', false);
 	}
 
-	const CATEGORY_POST = 'category-post';
+	const CATEGORY_POST    = 'category-post';
+	const CATEGORY_COUNTRY = 'category-country';
 
 	// SETTERS
 	public function setCategory($category){
@@ -92,5 +93,30 @@ class Translation extends DataLayer
 			'message' => $message,
 			'id'	  => $translationObj->data->id
 		]);
+	}
+
+	// get by baseWord and category, both are necessary
+	public function getByBaseWordAndCategory($baseWord, $category)
+	{
+		$translationObj = $this->find("baseWord = :baseWord and category = :category", "baseWord=$baseWord&category=$category")->fetch(true);
+		return $translationObj ? $translationObj : null;
+	}
+
+	/**
+     * Returns an array containing all data of translation 
+     * @version 1.0 - 20211030
+     * @return <array> of translation data 
+     */
+	public function getFullData()
+	{
+		$response = [
+			'id' 	   => $this->getId(),
+			'category' => $this->getCategory(),
+			'baseWord' => $this->getBaseWord(),
+			'en'       => $this->getEn(),
+			'pt' 	   => $this->getPt(),
+			'es' 	   => $this->getEs()
+		];
+		return $response;
 	}
 }

@@ -11,6 +11,7 @@ use Source\Models\City;
 use Source\Models\PersonRecoveryData;
 use Source\Support\Mail;
 use Datetime;
+use DOMDocument;
 
 /**
  * 
@@ -398,6 +399,57 @@ class PersonController
 			'message' => $message,
 			'content' => $cepData
 		]);
+	}
+
+	// get latitude and longitude by the cep
+	public function getLocationByCEP()
+	{
+		$cep = isset($_POST['cep']) ? $_POST['cep'] : null;
+		if(!$cep){
+			return json_encde([
+				'success' => false,
+				'message' => ucfirst(translate('no data sent'))
+			]);
+		}
+		// format cep
+		$cep = str_replace(['.', '-', '/'], '', $cep);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, 'https://www.mapacep.com.br/busca-cep.php');
+		curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, [
+			'keywords' => $cep,
+			'sid'  	   => 'Busca+por+CEP,+Cidade,+Endereço,+CNPJ+ou+Cód.+IBGE',
+			'submit'   => 'pesquisar'
+		]);
+		$answer = curl_exec($ch);
+		$pageResults = new DOMDocument();
+	    libxml_use_internal_errors(true);
+	    $pageResults->loadHTML($answer);
+
+	    $bs = $pageResults->getElementsByTagName('b');
+	    if($bs->length == 1)
+	    	return null;
+	    $dataGathered = [];
+	    foreach($bs as $bTag){
+	    	if($bTag->nodeValue != 'Endereço:')
+	    		continue;
+	    	$pWithData = $bTag->parentNode;
+	    	$bTagWithData = $pWithData->getElementsByTagName('b');
+	    	foreach($bTagWithData as $value){
+	    		$val = mb_strtolower(trim($value->nodeValue));
+	    		$val = str_replace(':', '', $val);
+	    		$dataGathered[$val] = mb_strtolower(trim($value->nextSibling->nodeValue));
+	    	}
+	    	break;
+	    }
+	    $latitude  = $dataGathered['latitude'];
+	    $longitude = $dataGathered['longitude'];
+	    return json_encode([
+	    	'success' => true,
+	    	'data'    => $dataGathered
+	    ]);
 	}
 
 	// Remove a photo

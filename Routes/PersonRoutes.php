@@ -59,6 +59,13 @@ $app->post('/trytofindcep', function(){
 	exit($result);
 });
 
+// try getting latitude and location by the cep
+$app->post('/getlocationbycep', function(){
+	$personCt = new PersonController();
+	$result = $personCt->getLocationByCEP();
+	exit($result);
+});
+
 $app->post('/login', function(){
 	$email    = isset($_POST['email']) ? $_POST['email'] : null;
 	$password = isset($_POST['password']) ? $_POST['password'] : null;
@@ -92,10 +99,20 @@ $app->post('/person/save', function(){
 	$parameters = [
 		'name' => 'Nickolas',
 		'lastName' => 'Alvaro Bini',
+		'dateOfBirth' => '2021-02-02',
 		'email' => 'tete@hotmail.com',
 		'password' => 'nica21',
 		'language' => '15',
-		'country' => '32'
+		'country' => '32',
+		'state' => '1',
+		'city' => '2',
+		'aboutMe' => '',
+		'skills' => '',
+		'cep' => '1',
+		'address' => '',
+		'addressNumber' => 's',
+		'role' => ''
+
 	];
 
 	exit($personCt->save($parameters));
@@ -187,29 +204,22 @@ $app->post('/personalpage/getmyworks', function(){
 
 // messages routes
 $app->post('/message/listmessages', function(){
-	if(!FunctionsClass::isPersonLoggedIn()){
-		$_SESSION['messages'] = ucfirst(translate('please, log in first'));
-		header('Location: /'.URL['urlDomain'].'/login');
-		exit;
-	}
 	$messageCt = new MessageController();
 	$myWorks = $messageCt->listMessages();
 	echo $myWorks;
 	return $myWorks;
 });
 
-$app->post('/personalpage/getmyworks', function(){
-	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
-	$personalPageCt = new PersonalPageController();
-	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+$app->post('/message/save', function(){
+	$messageCt = new MessageController();
+	$myWorks = $messageCt->save();
 	echo $myWorks;
 	return $myWorks;
 });
 
-$app->post('/personalpage/getmyworks', function(){
-	$personalPageId = isset($_POST['personalPageId']) ? $_POST['personalPageId'] : null;
-	$personalPageCt = new PersonalPageController();
-	$myWorks = $personalPageCt->getMyWorks($personalPageId);
+$app->post('/message/sendmessage', function(){
+	$messageCt = new MessageController();
+	$myWorks = $messageCt->sendMessage();
 	echo $myWorks;
 	return $myWorks;
 });

@@ -47,6 +47,7 @@ class State extends DataLayer
 	public function getStatesByCountry($countryId)
 	{
 		$statesObjArray = $this->find("country = :countryId", "countryId=$countryId")
+		->order('name')
 		->fetch(true);
 		return $statesObjArray;
 	}

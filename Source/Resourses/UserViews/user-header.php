@@ -36,17 +36,17 @@
 				<?php if(isset($_SESSION['personId'])){ ?>
 				<li title="<?php echo ucfirst(translate('my favorites menu')) ?>">
 					<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/star.svg">
-					<a href="favorites"><?php echo ucfirst(translate('favorites')); ?></a>
+					<a href="/<?= URL['urlDomain'] ?>/favorites"><?php echo ucfirst(translate('favorites')); ?></a>
 				</li>
 				<?php } ?>
 				<?php if(isset($_SESSION['personId'])){ ?>
 					<li title="<?php echo ucfirst(translate('my account information')) ?>">
 						<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/account.svg">
-						<a href="myaccount"><?php echo ucfirst(translate('my account')); ?></a>
+						<a href="/<?= URL['urlDomain'] ?>/myaccount"><?php echo ucfirst(translate('my account')); ?></a>
 					</li>
 				<?php } ?>
 				<li>
-					<a href="<?php if(isset($_SESSION['personId'])){ echo 'logout';}else{ echo 'login';}?>" title="<?php if(isset($_SESSION['personId'])){ echo ucfirst(translate('exit your account'));}else{echo ucfirst(translate('enter in your account'));}?>">
+					<a href="<?php if(isset($_SESSION['personId'])){ echo '/'. URL['urlDomain'] .'/logout';}else{ echo '/'.URL['urlDomain'].'/login';}?>" title="<?php if(isset($_SESSION['personId'])){ echo ucfirst(translate('exit your account'));}else{echo ucfirst(translate('enter in your account'));}?>">
 						<?php
 							if(isset($_SESSION['personId'])){
 								echo ucfirst(translate('exit'));
@@ -73,20 +73,20 @@
 			    	</a>
 			    </li>
 			    <li id="new" title="<?php echo ucfirst(translate('see the latest posts')) ?>">
-			    	<a href="news"><?php echo ucfirst(translate('news')); ?></a>
+			    	<a href="/<?= URL['urlDomain'] ?>/news"><?php echo ucfirst(translate('news')); ?></a>
 			    </li>
 			    <li id="map" title="<?php echo ucfirst(translate('search on the real time map')) ?>">
-			    	<a href="map"><?php echo ucfirst(translate('map')); ?></a>
+			    	<a href="/<?= URL['urlDomain'] ?>/map"><?php echo ucfirst(translate('map')); ?></a>
 			    </li>
 			    <li id="tips" title="<?php echo ucfirst(translate('know the best of the art')) ?>">
-			    	<a href="tips"><?php echo ucfirst(translate('tips')); ?></a>
+			    	<a href="/<?= URL['urlDomain'] ?>/tips"><?php echo ucfirst(translate('tips')); ?></a>
 			    </li>
 			    <li id="courses" title="<?php echo ucfirst(translate('see your courses')) ?>">
-			    	<a href="courses"><?php echo ucfirst(translate('courses')); ?></a>
+			    	<a href="/<?= URL['urlDomain'] ?>/courses"><?php echo ucfirst(translate('courses')); ?></a>
 			    </li>
 			    <?php if(isset($_SESSION['userRole']) && !is_null($_SESSION['userRole'])){ ?>
 				    <li id="posts" title="<?php echo ucfirst(translate('manage your posts')) ?>">
-				    	<a href="posts"><?php echo ucfirst(translate('posts')); ?></a>
+				    	<a href="/<?= URL['urlDomain'] ?>/posts"><?php echo ucfirst(translate('posts')); ?></a>
 				    </li>
 				<?php } ?>
 		    </ul>

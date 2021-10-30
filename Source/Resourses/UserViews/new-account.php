@@ -57,7 +57,12 @@
 				</div>
 				<h3 class="my-type-of-account" style="display: none;">I am a <h4 class="show-type-to-user"></h4></h3>
 				<h5 class="my-type-of-account-description">I like to inovate</h5>
-				<a class="option-button next-button-section-one">Next <div style="margin-left: -5%;"><i class="fas fa-angle-right"></i><i class="fas fa-angle-right"></i></div></a>
+				<a class="option-button next-button-section-one">Next
+					<div style="margin-left: -5%;">
+						<i class="fas fa-angle-right"></i>
+						<i class="fas fa-angle-right"></i>
+					</div>
+				</a>
 			</div>
 		</section>
 	</section>
@@ -67,15 +72,15 @@
 		<section class="section-wrapper">
 			<div class="input-wrapper">
 				<label><?php echo ucfirst(translate('your full name')) ?>*</label>
-				<input class="required" type="text">
+				<input class="required fullName" type="text">
 			</div>
 			<div class="input-wrapper small-input">
 				<label><?php echo ucfirst(translate('birth date')) ?>*</label>
-				<input class="required" type="date">
+				<input class="required dateOfBirth" type="date">
 			</div>
 			<div class="input-wrapper small-input" style="width: 10%;">
 				<label><?php echo ucfirst(translate('sex')) ?>*</label>
-				<select class="required">
+				<select class="required sex">
 					<option>M</option>
 					<option>F</option>
 					<option>U</option>
@@ -83,64 +88,60 @@
 			</div>
 			<div class="input-wrapper">
 				<label><?php echo ucfirst(translate('about you')) ?>*</label>
-				<textarea class="role-required" type="text"></textarea>
+				<textarea class="role-required personDescription" type="text"></textarea>
 			</div>
 			<div class="input-wrapper">
 				<label><?php echo ucfirst(translate('your habilities')) ?>*</label>
-				<textarea class="role-required" type="text"></textarea>
+				<textarea class="role-required personHabilities" type="text"></textarea>
 			</div>
 			<div class="input-wrapper small-input">
 				<label><?php echo ucfirst(translate('CEP')) ?>*</label>
-				<input id="cep" class="required" type="text">
+				<input id="cep" class="required cep" type="text">
 				<a id="search-for-cep" class="field-button"><?php echo ucfirst(translate('search')); ?></a>
-			</div>
-			<div class="text-wrapper" style="margin: 5% 0 5% 0;">
-				<label>or</label>
-			</div>
-			<div class="google-map-wrapper">
-				<div id="google-map-element" style="width: 100%; height: 100%;"></div>
 			</div>
 			<div class="text-wrapper">
 				<label>confirm your address</label>
 			</div>
 			<div class="input-wrapper">
 				<label>street</label>
-				<input class="required" type="text">
+				<input class="required street" type="text">
 			</div>
 			<div class="input-wrapper">
 				<label>neighborhood</label>
-				<input class="required" type="text">
+				<input class="required neighborhood" type="text">
 			</div>
 			<div class="input-wrapper small-input">
 				<label>number</label>
-				<input class="required" type="text">
+				<input class="required addressNumber" type="text">
 			</div>
 			<div class="input-wrapper">
 				<label>country</label>
-				<select class="required" id="countries-list">
+				<select class="required country" id="countries-list">
 					<option value="no option" selected="selected"><?php echo ucfirst(translate('plese, select your country')) ?></option>
 					<?php foreach($countries as $country){ ?>
 						<option class="country-option" data-countryId="<?= $country['id']?>" value="<?= $country['name'] ?>">
-							<?= $country['name'] ?>
+							<?php echo isset($country['translation']) ? $country['translation'][$_SESSION['userLanguage']] : $country['name']; ?>
 						</option>
 					<?php } ?>
 				</select>
 			</div>
 			<div id="states" class="input-wrapper" style="display: none;">
 				<label>state</label>
-				<select class="required" id="states-list"></select>
+				<select class="required state" id="states-list"></select>
 			</div>
 			<div id="cities" class="input-wrapper" style="display: none;">
 				<label>city</label>
-				<select class="required" id="cities-list"></select>
+				<select class="required city" id="cities-list"></select>
 			</div>
-			<div class="input-wrapper">
-				<img id="selected-photo" width="300px;" style="margin: auto;" src="Source/Resourses/External/icons/account.svg">
-			</div>
-			<div class="input-wrapper">
+			<div class="input-wrapper" title="<?php echo ucfirst(translate('choose a photo')); ?>">
 				<label>select a profile picture</label>
-				<br>
-				<input id="photo-chooser-input" type="file" name="profile-picute" class="marginate-center">
+				<img id="selected-photo" width="300px;" height="300px" style="margin: auto; border-radius: 50%;" src="Source/Resourses/External/icons/account.svg">
+				<input id="photo-chooser-input" class="profilePhoto" type="file" name="profile-picute" style="display: none;">
+			</div>
+			<div class="input-wrapper" title="<?php echo ucfirst(translate('choose a photo')); ?>">
+				<div id="add-photo-button">
+					<i class="fas fa-plus-circle"></i>
+				</div>
 			</div>
 			<a class="option-button next-button-section-two">Next
 				<div style="margin-left: -5%;">
@@ -151,7 +152,31 @@
 		</section>
 	</section>
 
-	<br><br><br><br><br><br><br><br>
+	<section class="third-section" style="display: none;">
+		<h2 class="creation-of-account-title"><?php echo ucfirst(translate('contact information')); ?></h2>
+		<section class="section-wrapper">
+			<div id="cities" class="input-wrapper">
+				<label>email</label>
+				<select class="required" id="cities-list"></select>
+			</div>
+			<div id="cities" class="input-wrapper">
+				<label>password</label>
+				<select class="required" id="cities-list"></select>
+			</div>
+			<div id="cities" class="input-wrapper">
+				<label>repeat password</label>
+				<select class="required" id="cities-list"></select>
+			</div>
+			<div id="cities" class="input-wrapper">
+				<label>contact number</label>
+				<select class="required" id="cities-list"></select>
+			</div>
+			<a class="option-button next-button-section-three"><?php echo ucfirst(translate('complete account')); ?></a>
+		</section>
+	</section>
+
+	<?php $this->insert('user-footer') ?>
+
 </body>
 </html>
 
@@ -181,11 +206,39 @@
 </div>
 
 <script src="Source/Resourses/JS-functions/modal.js"></script>
-<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBU-TEmfQj4HU2Janr2QIECDF2ciY1HvRY&callback=initMap"></script>
 <script type="text/javascript">
+	var accountData = {};
+
 	// to gather all data needed
 	$(document).ready(function() {
+		insertSection('section1');
+	});
 
+	// harvesting data informed
+	/*
+	'name' => 'Nickolas',
+	'lastName' => 'Alvaro Bini',
+	'dateOfBirth' => '2021-02-02',
+	'email' => 'tete@hotmail.com',
+	'password' => 'nica21',
+	'language' => '15',
+	'country' => '32',
+	'state' => '1',
+	'city' => '2',
+	'aboutMe' => '',
+	'skills' => '',
+	'cep' => '1',
+	'address' => '',
+	'addressNumber' => 's',
+	'role' => '
+	*/
+
+
+	$('#selected-photo').on('click', function(){ 
+		$('#photo-chooser-input').trigger('click');
+	});
+	$('#add-photo-button').on('click', function(){ 
+		$('#photo-chooser-input').trigger('click');
 	});
 
 	$('#cep').on('input', function(){
@@ -213,6 +266,7 @@
 		$('#account-type').removeClass('selected-on-menu');
 		$('#personal-data').addClass('selected-on-menu');
 		$('#personal-data').click();
+		accountData['role'] = userRole;
 	});
 	var pathForImg = '<?= URL['iconsPath'] ?>';
 	$('.role-name').hover(function(){
@@ -243,27 +297,26 @@
 	function handleViewsByType(typeOfUser){
 		switch(typeOfUser){
 			case 'serviceSuplier':
-			alert('please, select your type of service suplier');
-			$('.role-img-handle').hide();
-			openModal();
+				alert('please, select your type of service suplier');
+				$('.role-img-handle').hide();
+				openModal();
 			break;
-
 			case 'storeOrSeller':
-			userRole = 'seller';
-			$('#account-type').removeClass('selected-on-menu');
-			$('#personal-data').addClass('selected-on-menu');
-			$('#personal-data').click();
+				userRole = 'seller';
+				$('#account-type').removeClass('selected-on-menu');
+				$('#personal-data').addClass('selected-on-menu');
+				$('#personal-data').click();
+				accountData['role'] = userRole;
 			break;
-
 			case 'client':
-			userRole = 'client';
-			$('#account-type').removeClass('selected-on-menu');
-			$('#personal-data').addClass('selected-on-menu');
-			$('#personal-data').click();
+				userRole = 'client';
+				$('#account-type').removeClass('selected-on-menu');
+				$('#personal-data').addClass('selected-on-menu');
+				$('#personal-data').click();
+				accountData['role'] = userRole;
 			break;
-
 			default:
-			alert('an error occured');
+				alert('an error occured');
 			break;
 		}
 	}
@@ -293,12 +346,20 @@
 		if(currentSection == 'personal-data'){
 			$('.first-section').remove();
 		}
+		if(currentSection == 'section2'){
+			$('.second-section').remove();
+		}
 	}
 	// brings section two
 	function insertSection(sectionName){
+		if(sectionName == 'section1'){
+			$('.first-section').show();
+		}
 		if(sectionName == 'section2'){
-			//$('body').load('Source/Resourses/Components/new-account-section2.php');
 			$('.second-section').show();
+		}
+		if(sectionName == 'section3'){
+			$('.third-section').show();
 		}
 	}
 	$('#personal-data').on('click', function(){
@@ -404,76 +465,41 @@
 	    reader.readAsDataURL(input.files[0]);
 	};
 
-
-
-
-	// googler map related methods
-	function initMap(){
-		var latitudeCookie  = "<?= isset($_COOKIE['latitude'])  ? $_COOKIE['latitude']  : '' ?>";
-		var longitudeCookie = "<?= isset($_COOKIE['longitude']) ? $_COOKIE['longitude'] : '' ?>";
-		// checking if it has cookies
-		if(latitudeCookie != '' && longitudeCookie != ''){
-			var location = {
-				lat:parseFloat(latitudeCookie),
-				lng:parseFloat(longitudeCookie)
+	var dataNames = ['fullName', 'dateOfBirth', 'sex', 'personDescription', 'personHabilities', 'cep', 'street', 'neighborhood', 'addressNumber', 'country', 'state', 'city', 'profilePhoto'];
+	$('.next-button-section-two').on('click', function(){
+		var hasNeededFields = true;
+		var requiredFields = $('.second-section').find('.required');
+		requiredFields.each(function(){
+			var value = $(this).val()
+			if(value == ''){
+				$(this).addClass('must-complete');
+				hasNeededFields = false;
 			}
-			var options = {
-				center: location,
-				zoom: 18
-			}
-			map = new google.maps.Map(document.getElementById('google-map-element'), options);
-			new google.maps.Marker({
-			    position: location,
-			    map,
-			});
-		}else{
-			var latitudeOfSession = <?= $_SESSION['userLatitude'] ?>;
-			var longitudeOfSession = <?= $_SESSION['userLongitude'] ?>;
-			var location = {
-				lat:parseFloat(latitudeOfSession),
-				lng:parseFloat(longitudeOfSession)
-			}
-			var options = {
-				center: location,
-				zoom: 18
-			}
-			if(navigator.geolocation){
-				navigator.geolocation.getCurrentPosition((loc) => {
-					location.lat = loc.coords.latitude;
-					location.lng = loc.coords.longitude;
-					var currentLocation =  {
-						lat: location.lat,
-						lng: location.lng
-					}
-					// write current position to the map
-					map = new google.maps.Map(document.getElementById('google-map-element'), options);
-					// inserting a marker
-					new google.maps.Marker({
-					    position: currentLocation,
-					    map,
-					});
-
-					updateLocationCokies(location.lat, location.lng);
-				},
-				(err) => {
-					map = new google.maps.Map(document.getElementById('google-map-element'), options);
-				}
-				)
-			}else{
-				map = new google.maps.Map(document.getElementById('google-map-element'), options)
-			}
-		}
-	}
-	function updateLocationCokies(latitude, longitude){
-		$.ajax({
-		  	url: 'updatecookies/usergeolocation',
-		  	type: 'POST',
-		  	data: {latitude: latitude, longitude: longitude},
-		  	success: function(result){
-		    	console.log(result);
-		    }
 		});
-	}
+
+		if(hasNeededFields == false){
+			$(document).scrollTop(0);
+			alert('please, enter the required fields');
+			return;
+		}
+
+		for(i = 0; i < dataNames.length; i++){
+			if(dataNames[i] == 'profilePhoto'){
+				accountData['profilePhoto'] = $('#selected-photo').attr('src');
+				continue;
+			}
+			accountData[dataNames[i]] = $('.'+dataNames[i]).val();
+		}
+
+		// calling next section		
+		removeFormerSection('section2');
+		$('#personal-data').removeClass('selected-on-menu');
+		$('#account-confirmation').addClass('selected-on-menu');
+		insertSection('section3');
+	});
+
+	// section 3
+	
 </script>
 
 <style type="text/css">
@@ -484,7 +510,7 @@
 		cursor: pointer;
 	}
 	*{
-		font-family: Sen;
+		font-family: Arial, Helvetica, sans-serif;
 	}
 	header{
 		margin-bottom: 5%;
@@ -581,6 +607,9 @@
 	/* contents */
 	.creation-of-account-title{
 		text-align: center;
+	}
+	.master-section{
+
 	}
 	.section-wrapper{
 		display: flex;
@@ -692,5 +721,19 @@
 		width: 50%;
 		margin: auto;
 		margin-top: 10%;
+	}
+
+	#add-photo-button{
+		width: 25%;
+		margin: auto;
+		font-size: 3em;
+		color: rgba(0, 0, 0, 0.67);
+	}
+	#add-photo-button:hover{
+		color: rgba(218, 221, 90, 0.78);
+	}
+
+	.must-complete{
+		border: 1px solid red;
 	}
 </style>

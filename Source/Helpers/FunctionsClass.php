@@ -366,4 +366,39 @@ class FunctionsClass extends DataLayer
 		}
 		return null;
 	}
+
+	
+    /**
+     * convert date string to dateTime object
+     * Obs: enter a date string in ISO or Y-m-d format
+     * @param	<string> $dateString
+     * @return DateTime|null
+     */
+    public static function convertDateStringToDateTimeObject($dateString)
+    {
+        if(is_null($dateString)){
+            return null;
+        }
+        
+        try{
+            $dateTime = new DateTime($dateString);
+            return $dateTime;
+        }catch(Exception $e){
+            return null;
+        }
+    }
+
+    /**
+     * convert dateTime object to dateIso
+     * @param	<DateTime> $dateTime
+     * @return string|null
+     */
+    public static function convertDateTimeObjectToDateIso($dateTime)
+    {
+        if($dateTime instanceof DateTime){
+            return $dateTime->format(DateTime::ISO8601);
+        }else{
+            return null;
+        }
+    }
 }

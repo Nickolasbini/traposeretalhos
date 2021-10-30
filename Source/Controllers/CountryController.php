@@ -5,6 +5,7 @@ namespace Source\Controllers;
 use Source\Models\Country;
 use Source\Models\State;
 use Source\Models\City;
+use Source\Models\Translation;
 use Source\Helpers\FunctionsClass;
 use DOMDocument;
 
@@ -232,5 +233,87 @@ class CountryController{
             }
         }
         return $asArray ? $elements : json_encode($elements);
+    }
+
+    // translate countries translations by online file
+    public function feedCountryTranslations()
+    {
+        $countryObj = new Country();
+
+        $countryTranslations = [];
+
+        $portugueseFilePath  = TMPPATH['files'] . 'countriesInPortuguese.json';
+        $portugueseFileArray = json_decode(file_get_contents($portugueseFilePath), true);
+        foreach($portugueseFileArray as $ptData){
+            $iSOCode = strtoupper($ptData['sigla2']);
+            $pt      = $ptData['nome'];
+            $position = strpos($pt, '(');
+            if(is_numeric($position) && $position > 0){
+                $pt = trim(substr($pt, 0, $position));
+            }
+            $countryTranslations[$iSOCode]['pt'] = $pt;
+        }
+        $spanishFilePath = TMPPATH['files'] . 'countriesInSpanish.txt';
+        $file = fopen($spanishFilePath, "r");
+        while(! feof($file)) {
+          $line = fgets($file);
+          $lineData = preg_replace('/\t/', '@@@@', $line);
+          $lineData = explode('@@@@', $lineData);
+          $iSOCode = strtoupper(trim($lineData[0]));
+          $es      = trim($lineData[1]);
+          $countryTranslations[$iSOCode]['es'] = $es;
+        }
+        fclose($file);
+        $report = [
+            'updated'    => 0,
+            'notUpdated' => 0
+        ];
+        $translationObj = new Translation();
+        foreach($countryTranslations as $countryISO => $translations){
+            $hasTranslationObj = null;
+            $ptTranslation = array_key_exists('pt', $translations) ? $translations['pt'] : null;
+            $esTranslation = array_key_exists('es', $translations) ? $translations['es'] : null;
+            $country = $countryObj->getCountryByAlphaCode($countryISO);
+            if(!$country)
+                continue;
+            $enTranslation = $country->getName();
+            if(!$country->getTranslation()){
+                // create a new one
+                $translationObj = new Translation();
+                $translationObj->setCategory(Translation::CATEGORY_COUNTRY);
+                $translationObj->setBaseWord($enTranslation);
+                $result = $translationObj->save();
+                // gather translation object
+                $hasTranslationObj = $translationObj->getByBaseWordAndCategory($enTranslation, Translation::CATEGORY_COUNTRY);
+                if(!$hasTranslationObj)
+                    continue;
+                $country->setTranslation($hasTranslationObj[0]->getId());
+                $country->save();
+            }
+            if(!$hasTranslationObj){
+                $translationObj = $country->getTranslation(true);
+            }else{
+                $translationObj = $hasTranslationObj;
+            }
+            $translationObj = is_array($translationObj) ? $translationObj[0] : $translationObj;
+            // update translations
+            $position = strpos($translationObj->getEn(), '(');
+            if(is_numeric($position) && $position > 0){
+                $enTranslation = trim(substr($translationObj->getEn(), 0, $position));
+                $translationObj->setBaseWord(mb_strtolower($enTranslation));
+            }
+            $translationObj->setEn(mb_strtolower($enTranslation));
+            $translationObj->setPt(mb_strtolower($ptTranslation));
+            $translationObj->setEs(mb_strtolower($esTranslation));
+            $result = $translationObj->save();
+            if(!$result){
+                $report['notUpdated'];
+            }
+            $report['updated'];
+        }
+        return json_encode([
+            'success' => true,
+            'report'  => $report
+        ]);
     }
 }

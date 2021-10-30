@@ -82,6 +82,12 @@ $app->get('/country/syncwithunece', function(){
 	exit($countryCt->syncWithUnece());
 });
 
+// Sync countries from Unece website
+$app->get('/country/feedtranslations', function(){
+	$countryCt = new CountryController();
+	exit($countryCt->feedCountryTranslations());
+});
+
 // Sync langauges and relate them to countries
 $app->get('/language/synccountrylanguages', function(){
 	$languageCk = new LanguageController();

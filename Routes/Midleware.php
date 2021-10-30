@@ -2,6 +2,8 @@
 
 use Source\Models\Person;
 
+use Source\Helpers\FunctionsClass;
+
 /**
  * 
  */
@@ -9,15 +11,13 @@ class Midleware
 {
 	public static function checkLogin()
 	{
-		// exit(json_encode($_SESSION));
 		$request = $_SERVER['REQUEST_URI'];
 		$request = str_replace('/'.URL['urlDomain'], '', $request);
 		$routesToVerify = ['/post/save', '/message/listmessages'];
 		foreach($routesToVerify as $routeName){
 			if($request == $routeName){
 				$result = Midleware::tryToLogin();
-
-				if(!isset($_SESSION['personId']) || is_null($_SESSION['personId'])){
+				if(!$result){
 					$_SESSION['errorMessage'] = ucfirst(translate('please log in first'));
 		            $_SESSION['messages'] = ucfirst(translate('please, log in first'));
 					header('Location: /'.URL['urlDomain'].'/login');
@@ -30,7 +30,9 @@ class Midleware
 	}
 
 	/*
-		tries to login by session\cookie\e
+		tries to login by session\cookie\email and password parameters
+		obs: if manages to find updates cookie and session
+		@return true on successs and false on failure
 	*/
 	public static function tryToLogin()
 	{

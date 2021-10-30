@@ -87,15 +87,16 @@ class Document extends DataLayer
 					break;
 			}
 			imagecopyresampled($newImage, $oldImage, 0, 0, 0, 0, 256, 256, $oldWidth, $oldHeight);
-			$image = imagejpeg($newImage);
+			
 			// generating a random file name
-			$fileName = FunctionsClass::generateRandomValue().'-'.$personId.'jpeg';
-			$done = file_put_contents(TMPPATH['images'].$fileName, $image);
+			$fileName = FunctionsClass::generateRandomValue().'-'.$personId.'.jpeg';
+			$filePath = TMPPATH['images'].$fileName;
+			$done = imagejpeg($newImage, $filePath);
 			if($done){
 				$response[] = [
 					'directory' => 'img',
 					'path'		=> TMPPATH['images'],
-					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$name,
+					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$fileName,
 					'name'		=> $fileName
 				];
 			}
@@ -116,6 +117,7 @@ class Document extends DataLayer
 			$documentObj->setDirectory($data['directory']);
 			$documentObj->setPath($data['path']);
 			$documentObj->setName($data['name']);
+			$documentObj->setWebPath($data['webPath']);
 			$saveResult = $documentObj->save();
 			if($saveResult)
 				$documentsIds[] = $documentObj->data->id;			

@@ -4,6 +4,7 @@ namespace Source\Models;
 
 use CoffeeCode\DataLayer\DataLayer;
 use Source\Models\CountryLanguage;
+use Source\Models\Translation;
 
 /**
  * 
@@ -28,6 +29,9 @@ class Country extends DataLayer
 	public function setRegion($region){
 		$this->region = $region;
 	}
+	public function setTranslation($translation){
+		$this->translation = $translation;
+	}
 	// GETTERS
 	public function getId(){
 		return $this->id;
@@ -43,6 +47,16 @@ class Country extends DataLayer
 	}
 	public function getRegion(){
 		return $this->region;
+	}
+	public function getTranslation($asObject = null){
+		if($asObject){
+			if(!$this->translation){
+				return null;
+			}
+			$translationObj = (new Translation)->findById($this->translation);
+			return $translationObj;
+		}
+		return $this->translation;
 	}
 
 	// gets this country languages
@@ -91,6 +105,12 @@ class Country extends DataLayer
 			'alphaCode3'  => $this->getAlphaCode3(),
 			'region' 	  => $this->getRegion()
 		];
+		$translation = $this->getTranslation(true);
+		$translationData = null;
+		if($translation){
+			$translationData = $translation->getFullData();
+		}
+		$response['translation'] = $translationData;
 		return $response;
 	}
 }

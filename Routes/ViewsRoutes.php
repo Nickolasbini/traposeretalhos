@@ -24,7 +24,6 @@ $app->get('/courses', function(){
 $app->get('/newaccount', function(){
 	$countryCt = new CountryController();
 	$countries = $countryCt->fetchAllContries(true);
-
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
 	echo $userTemplate->render('new-account', [
 		'title' => ucfirst(translate('create account')),
