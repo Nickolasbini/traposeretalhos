@@ -86,40 +86,32 @@
 					<option>U</option>
 				</select>
 			</div>
-			<div class="input-wrapper">
-				<label><?php echo ucfirst(translate('about you')) ?>*</label>
-				<textarea class="role-required personDescription" type="text"></textarea>
-			</div>
-			<div class="input-wrapper">
-				<label><?php echo ucfirst(translate('your habilities')) ?>*</label>
-				<textarea class="role-required personHabilities" type="text"></textarea>
-			</div>
 			<div class="input-wrapper small-input">
 				<label><?php echo ucfirst(translate('CEP')) ?>*</label>
 				<input id="cep" class="required cep" type="text">
 				<a id="search-for-cep" class="field-button"><?php echo ucfirst(translate('search')); ?></a>
 			</div>
-			<div class="text-wrapper">
+			<div class="text-wrapper need-cep-to-be-informed">
 				<label>confirm your address</label>
 			</div>
-			<div class="input-wrapper">
+			<div class="input-wrapper need-cep-to-be-informed">
 				<label>street</label>
 				<input class="required street" type="text">
 			</div>
-			<div class="input-wrapper">
+			<div class="input-wrapper need-cep-to-be-informed">
 				<label>neighborhood</label>
 				<input class="required neighborhood" type="text">
 			</div>
-			<div class="input-wrapper small-input">
+			<div class="input-wrapper small-input need-cep-to-be-informed">
 				<label>number</label>
 				<input class="required addressNumber" type="text">
 			</div>
-			<div class="input-wrapper">
+			<div class="input-wrapper need-cep-to-be-informed">
 				<label>country</label>
 				<select class="required country" id="countries-list">
 					<option value="no option" selected="selected"><?php echo ucfirst(translate('plese, select your country')) ?></option>
 					<?php foreach($countries as $country){ ?>
-						<option class="country-option" data-countryId="<?= $country['id']?>" value="<?= $country['name'] ?>">
+						<option class="country-option countryID-<?= $country['id'] ?>" data-countryId="<?= $country['id']?>" value="<?= $country['name'] ?>">
 							<?php echo isset($country['translation']) ? $country['translation'][$_SESSION['userLanguage']] : $country['name']; ?>
 						</option>
 					<?php } ?>
@@ -155,21 +147,17 @@
 	<section class="third-section" style="display: none;">
 		<h2 class="creation-of-account-title"><?php echo ucfirst(translate('contact information')); ?></h2>
 		<section class="section-wrapper">
-			<div id="cities" class="input-wrapper">
+			<div class="input-wrapper">
 				<label>email</label>
-				<select class="required" id="cities-list"></select>
+				<input class="required email" type="email">
 			</div>
-			<div id="cities" class="input-wrapper">
+			<div class="input-wrapper">
 				<label>password</label>
-				<select class="required" id="cities-list"></select>
+				<input class="required password" type="password">
 			</div>
-			<div id="cities" class="input-wrapper">
+			<div class="input-wrapper">
 				<label>repeat password</label>
-				<select class="required" id="cities-list"></select>
-			</div>
-			<div id="cities" class="input-wrapper">
-				<label>contact number</label>
-				<select class="required" id="cities-list"></select>
+				<input class="required repeatPassword" type="password">
 			</div>
 			<a class="option-button next-button-section-three"><?php echo ucfirst(translate('complete account')); ?></a>
 		</section>
@@ -212,27 +200,8 @@
 	// to gather all data needed
 	$(document).ready(function() {
 		insertSection('section1');
+		$('.need-cep-to-be-informed').hide();
 	});
-
-	// harvesting data informed
-	/*
-	'name' => 'Nickolas',
-	'lastName' => 'Alvaro Bini',
-	'dateOfBirth' => '2021-02-02',
-	'email' => 'tete@hotmail.com',
-	'password' => 'nica21',
-	'language' => '15',
-	'country' => '32',
-	'state' => '1',
-	'city' => '2',
-	'aboutMe' => '',
-	'skills' => '',
-	'cep' => '1',
-	'address' => '',
-	'addressNumber' => 's',
-	'role' => '
-	*/
-
 
 	$('#selected-photo').on('click', function(){ 
 		$('#photo-chooser-input').trigger('click');
@@ -241,8 +210,10 @@
 		$('#photo-chooser-input').trigger('click');
 	});
 
-	$('#cep').on('input', function(){
-		var cep = $(this).val();
+	// search for cep and complete data accordingly to return
+	$('#search-for-cep').on('click', function(){
+		alert('put a loader here');
+		var cep = $('#cep').val();
 		$.ajax({
 			url: 'trytofindcep',
 			type: 'POST',
@@ -250,11 +221,43 @@
 			dataType: 'JSON',
 			success: function(data){
 				if(data.content != null){
+					$('.need-cep-to-be-informed').show();
 					alert('found something');
+					fillFieldsWithCEPData(data);
+					return;
 				}
+				alert('please enter a valid CEP');
+			},
+			complete: function(){
+				alert('the loader end');
 			}
 		});
 	});
+
+	// fill fields with gathered data
+	function fillFieldsWithCEPData(data = null){
+		if(data == null || data.length < 1){
+			alert('an error occured');
+			return;
+		}
+		var city 		 = data['cityName'];
+		var neighborhood = data['neighborhood'];
+		var street 		 = data['streetName'];
+		var stateISO     = data['stateCode'];
+
+		$.ajax({
+			url: 'state/getcountrybystate',
+			type: 'POST',
+			data: {stateISO: stateISO},
+			dataType: 'JSON',
+			success: function(data){
+				if(data.success){
+					$('#countries-list').val(countryName);
+				}
+			}
+		});
+
+	}
 
 	/* Section one */
 	$('#account-type').addClass('selected-on-menu');
@@ -361,6 +364,7 @@
 		if(sectionName == 'section3'){
 			$('.third-section').show();
 		}
+		$(document).scrollTop(0);
 	}
 	$('#personal-data').on('click', function(){
 		if($(this).hasClass('selected-on-menu') == false){
@@ -465,7 +469,7 @@
 	    reader.readAsDataURL(input.files[0]);
 	};
 
-	var dataNames = ['fullName', 'dateOfBirth', 'sex', 'personDescription', 'personHabilities', 'cep', 'street', 'neighborhood', 'addressNumber', 'country', 'state', 'city', 'profilePhoto'];
+	var dataNames = ['fullName', 'dateOfBirth', 'sex', 'cep', 'street', 'neighborhood', 'addressNumber', 'country', 'state', 'city', 'profilePhoto'];
 	$('.next-button-section-two').on('click', function(){
 		var hasNeededFields = true;
 		var requiredFields = $('.second-section').find('.required');
@@ -499,6 +503,34 @@
 	});
 
 	// section 3
+	$('.next-button-section-three').on('click', function(){
+		var hasNeededFields = true;
+		var required = $('.third-section').find('.required');
+		required.each(function(){
+			var value = $(this).val();
+			if(value == ''){
+				$(this).addClass('must-complete');
+				hasNeededFields = false;
+			}
+		});
+		if(hasNeededFields == false){
+			$(document).scrollTop(0);
+			alert('please, enter the required fields');
+			return;
+		}
+
+		var password = $('.password').val();
+		if(password != $('.repeatPassword').val()){
+			alert('password does no match');
+			return;
+		}
+
+		accountData['email']         = $('.email').val();
+		accountData['password']      = $('.password').val();
+
+
+
+	});
 	
 </script>
 

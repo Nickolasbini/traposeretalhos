@@ -2,6 +2,7 @@
 use Source\Controllers\PersonController;
 use Source\Controllers\CityController;
 use Source\Controllers\StateController;
+use Source\Controllers\CountryController;
 use Source\Controllers\PersonalPageController;
 use Source\Controllers\MessageController;
 use Source\Models\PersonRole;
@@ -163,6 +164,14 @@ $app->get('/city/getcitiesofcountry', function(){
 		'success' => true,
 		'content' => $content
 	]);
+});
+
+// getting country by state iso
+$app->post('/state/getcountrybystate', function(){
+	$stateCt = new StateController();
+	$country = $stateCt->getCountryByState();
+	echo $country;
+	return $country;
 });
 
 // getting states of country

@@ -268,6 +268,8 @@ class Person extends DataLayer
         if(curl_errno($ch) || is_null($answerArray)){
         	return null;
         }
+        if(!array_key_exists('cep', $answerArray))
+        	return null;
         $response = [
         	'cep' 		   => $answerArray['cep'],
         	'streetName'   => $answerArray['logradouro'],

@@ -38,4 +38,39 @@ class StateController{
 		]);
 	}
 
+    public function getCountryByState()
+    {
+        $stateISO = isset($_POST['stateISO']) ? strtoupper($_POST['stateISO']) : null;
+        if(is_null($stateISO)){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('state iso is required'))
+            ]);
+        }
+        $stateObj = new State();
+        $state = $stateObj->getStateByIsoCode($stateISO);
+        if(!$state){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('state iso is invalid'))
+            ]);   
+        }
+        $country = $state->getCountry(true);
+        if(!$state){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('state iso is invalid'))
+            ]);   
+        }
+        $countryFullData = $country->getFullData();
+        $translatedName = null;
+        $languageISO = $_SESSION['userLanguage'];
+        if(array_key_exists('translation', $countryFullData) && $cpuntry)
+        return json_encode([
+        	'success' => true,
+        	'message' => ucfirst(translate('country found')),
+        	'data'	  => $countryFullData,
+        	'countryTranslation' => ''
+        ]);
+    }
 }
