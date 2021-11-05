@@ -133,10 +133,14 @@
 	}
 
 	
-	  $('#menu-icon-bar').on('click', function(){
-	  	  $(this).toggleClass('menu-bar-oppened');
-	  	  $('.dropdown-menu').toggleClass('opened-dropdown-menu');
-	  });
+    $('#menu-icon-bar').on('click', function(){
+  	    $(this).toggleClass('menu-bar-oppened');
+  	    $('.dropdown-menu').toggleClass('opened-dropdown-menu');
+    });
+
+	function capitalize(string) {
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
 </script>
 
 <style type="text/css">

@@ -73,6 +73,7 @@
 			<div class="input-wrapper">
 				<label><?php echo ucfirst(translate('your full name')) ?>*</label>
 				<input class="required fullName" type="text">
+				<label class="name-tip" style="margin: 0; display: none;"><?php echo ucfirst(translate('special letters are not valid. Ex: @, # ...')) ?></label>
 			</div>
 			<div class="input-wrapper small-input">
 				<label><?php echo ucfirst(translate('birth date')) ?>*</label>
@@ -95,24 +96,12 @@
 				<label>confirm your address</label>
 			</div>
 			<div class="input-wrapper need-cep-to-be-informed">
-				<label>street</label>
-				<input class="required street" type="text">
-			</div>
-			<div class="input-wrapper need-cep-to-be-informed">
-				<label>neighborhood</label>
-				<input class="required neighborhood" type="text">
-			</div>
-			<div class="input-wrapper small-input need-cep-to-be-informed">
-				<label>number</label>
-				<input class="required addressNumber" type="text">
-			</div>
-			<div class="input-wrapper need-cep-to-be-informed">
 				<label>country</label>
 				<select class="required country" id="countries-list">
 					<option value="no option" selected="selected"><?php echo ucfirst(translate('plese, select your country')) ?></option>
 					<?php foreach($countries as $country){ ?>
 						<option class="country-option countryID-<?= $country['id'] ?>" data-countryId="<?= $country['id']?>" value="<?= $country['name'] ?>">
-							<?php echo isset($country['translation']) ? $country['translation'][$_SESSION['userLanguage']] : $country['name']; ?>
+							<?php echo isset($country['translation']) ? ucfirst($country['translation'][$_SESSION['userLanguage']]) : ucfirst($country['name']); ?>
 						</option>
 					<?php } ?>
 				</select>
@@ -124,6 +113,18 @@
 			<div id="cities" class="input-wrapper" style="display: none;">
 				<label>city</label>
 				<select class="required city" id="cities-list"></select>
+			</div>
+			<div class="input-wrapper need-cep-to-be-informed">
+				<label>street</label>
+				<input class="required street" type="text">
+			</div>
+			<div class="input-wrapper need-cep-to-be-informed">
+				<label>neighborhood</label>
+				<input class="required neighborhood" type="text">
+			</div>
+			<div class="input-wrapper small-input need-cep-to-be-informed">
+				<label>number</label>
+				<input class="required addressNumber" type="text">
 			</div>
 			<div class="input-wrapper" title="<?php echo ucfirst(translate('choose a photo')); ?>">
 				<label>select a profile picture</label>
@@ -223,7 +224,7 @@
 				if(data.content != null){
 					$('.need-cep-to-be-informed').show();
 					alert('found something');
-					fillFieldsWithCEPData(data);
+					fillFieldsWithCEPData(data.content);
 					return;
 				}
 				alert('please enter a valid CEP');
@@ -235,16 +236,24 @@
 	});
 
 	// fill fields with gathered data
+	var city = null;
+	var neighborhood = null;
+	var street = null;
+	var stateISO = null;
 	function fillFieldsWithCEPData(data = null){
 		if(data == null || data.length < 1){
 			alert('an error occured');
 			return;
 		}
-		var city 		 = data['cityName'];
-		var neighborhood = data['neighborhood'];
-		var street 		 = data['streetName'];
-		var stateISO     = data['stateCode'];
-
+		city 		 = data['cityName'];
+		neighborhood = data['neighborhood'];
+		street 		 = data['streetName'];
+		stateISO     = data['stateCode'];
+		$('.street').val(street);
+		$('.street').removeClass('must-complete');
+		$('.neighborhood').val(neighborhood);
+		$('.neighborhood').removeClass('must-complete');
+		var dataFound = null;
 		$.ajax({
 			url: 'state/getcountrybystate',
 			type: 'POST',
@@ -252,8 +261,16 @@
 			dataType: 'JSON',
 			success: function(data){
 				if(data.success){
-					$('#countries-list').val(countryName);
+					dataFound = data;
 				}
+			},
+			complete: function(){
+				if(dataFound == null){
+
+					return;
+				}
+				$('.countryID-'+dataFound.data.id).attr('selected','selected');
+				$('#countries-list').change();
 			}
 		});
 
@@ -407,12 +424,15 @@
 						var states = data.content;
 						console.log(states);
 						for(i = 0; i < states.length; i++){
-							console.log(states[i]);
-							statesOptions += '<option data-stateId="'+states[i]['id']+'" value="'+states[i]['isoCode']+'">'+states[i]['isoCode']+'</option>';
+							statesOptions += '<option class="stateName-'+states[i]['isoCode']+'" data-stateId="'+states[i]['id']+'" value="'+states[i]['isoCode']+'">'+states[i]['isoCode']+'</option>';
 						}
 						$('#states-list').append(statesOptions);
 					}
 				}
+			},
+			complete: function(){
+				$('.stateName-'+stateISO).attr('selected', 'selected');
+				$('#states-list').change();
 			}
 		});
 	});
@@ -441,12 +461,27 @@
 						var cities = data.content;
 						console.log(cities);
 						for(i = 0; i < cities.length; i++){
-							citiesOptions += '<option data-cityId="'+cities[i]['id']+'" value="'+cities[i]['name']+'">'+cities[i]['name']+'</option>';
+							citiesOptions += '<option class="cityISOCode-'+cities[i]['isoCode']+'" data-cityId="'+cities[i]['id']+'" value="'+cities[i]['name']+'">'+capitalize(cities[i]['regionName'])+'</option>';
 						}
-						console.log(citiesOptions);
 						$('#cities-list').append(citiesOptions);
 					}
 				}
+			},
+			complete: function(){
+				$.ajax({
+					url: 'city/gathercitybyname',
+					type: 'POST',
+					data: {cityName: city},
+					dataType: 'JSON',
+					success: function(response){
+						if(response.success == true){
+							var cityData = response.data;
+							var isoCodeOfCity = cityData.isoCode;
+							$('.cityISOCode-'+isoCodeOfCity).attr('selected', 'selected');
+							$('#cities-list').change();
+						}
+					}
+				});
 			}
 		});
 	});
@@ -469,10 +504,16 @@
 	    reader.readAsDataURL(input.files[0]);
 	};
 
+	$('.fullName').on('input', function(){
+		$('.name-tip').hide();
+	});
+
+	var invalidWords = ['@', '#', '!', '?', '/', '|', ',', ';', '&', '*', '+', '-', '(', ')', ':', '.', ':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 	var dataNames = ['fullName', 'dateOfBirth', 'sex', 'cep', 'street', 'neighborhood', 'addressNumber', 'country', 'state', 'city', 'profilePhoto'];
 	$('.next-button-section-two').on('click', function(){
 		var hasNeededFields = true;
 		var requiredFields = $('.second-section').find('.required');
+		requiredFields.removeClass('must-complete');
 		requiredFields.each(function(){
 			var value = $(this).val()
 			if(value == ''){
@@ -488,12 +529,45 @@
 		}
 
 		for(i = 0; i < dataNames.length; i++){
+			if(dataNames[i] == 'fullName'){
+				var name = $('.'+dataNames[i]).val();
+				if(name.length < 5){
+					$(document).scrollTop($('.fullName'));
+					$('.fullName').focus();
+					alert('name is too short, minimum length is five');
+					return;
+				}
+				for(o = 0; o < invalidWords.length; o++){
+					if(name.search(invalidWords[o]) != -1){
+						$(document).scrollTop($('.fullName'));
+						$('.fullName').focus();
+						$('.name-tip').show();
+						alert('invalid character in name');
+						return;
+					}
+				}
+			}
 			if(dataNames[i] == 'profilePhoto'){
 				accountData['profilePhoto'] = $('#selected-photo').attr('src');
 				continue;
 			}
 			accountData[dataNames[i]] = $('.'+dataNames[i]).val();
 		}
+
+		$.ajax({
+			url: 'person/verifyname',
+			type: 'POST',
+			data: {name: accountData['fullName']},
+			dataType: 'JSON',
+			success: function(response){
+				if(response.success == true){
+					var cityData = response.data;
+					var isoCodeOfCity = cityData.isoCode;
+					$('.cityISOCode-'+isoCodeOfCity).attr('selected', 'selected');
+					$('#cities-list').change();
+				}
+			}
+		});
 
 		// calling next section		
 		removeFormerSection('section2');
@@ -532,6 +606,9 @@
 
 	});
 	
+	function capitalize(text) {
+	    return text.charAt(0).toUpperCase() + text.slice(1);
+	}
 </script>
 
 <style type="text/css">

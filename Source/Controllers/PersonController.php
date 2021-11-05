@@ -563,4 +563,24 @@ class PersonController
         	'content' => $elementsArray
         ]);
     }
+
+    public function verifyUsageOfName()
+    {
+    	$nameToVerify = isset($_POST['name']) ? $_POST['name'] : null;
+    	if(!$nameToVerify){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('no name sent')) 
+    		]);
+    	}
+    	if(strlen($nameToVerify) > 5){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('name is too short')) 
+    		]);
+    	}
+
+    	$personObj = new Person();
+    	$result = $personObj->getByName($nameToVerify);
+    }
 }

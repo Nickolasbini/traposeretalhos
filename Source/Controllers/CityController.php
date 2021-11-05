@@ -84,4 +84,28 @@ class CityController
 
 		]);
 	}
+
+	public function getByName()
+	{
+		$cityName = isset($_POST['cityName']) ? $_POST['cityName'] : null;
+		if(!$cityName){
+			return json_encode([
+				'success' => false,
+				'message' => ucfirst(translate('a city name is required'))
+			]);
+		}
+		$cityObj = new City();
+		$city = $cityObj->getCityByName($cityName);
+		if(!$city){
+			return json_encode([
+				'success' => false,
+				'message' => ucfirst(translate('no city found'))
+			]);	
+		}
+		$element = $city->getFullData();
+		return json_encode([
+			'success' => true,
+			'data'	  => $element
+		]);
+	}
 }

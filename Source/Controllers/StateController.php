@@ -38,6 +38,7 @@ class StateController{
 		]);
 	}
 
+	// get the country data by a State ISO
     public function getCountryByState()
     {
         $stateISO = isset($_POST['stateISO']) ? strtoupper($_POST['stateISO']) : null;
@@ -65,12 +66,14 @@ class StateController{
         $countryFullData = $country->getFullData();
         $translatedName = null;
         $languageISO = $_SESSION['userLanguage'];
-        if(array_key_exists('translation', $countryFullData) && $cpuntry)
+        if(array_key_exists('translation', $countryFullData) && !is_null($countryFullData['translation'][$languageISO])){
+        	$translatedName = $countryFullData['translation'][$languageISO];
+        }
         return json_encode([
         	'success' => true,
         	'message' => ucfirst(translate('country found')),
         	'data'	  => $countryFullData,
-        	'countryTranslation' => ''
+        	'countryTranslation' => $translatedName
         ]);
     }
 }

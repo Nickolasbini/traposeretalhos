@@ -193,6 +193,14 @@ $app->post('/city/getcitiesofstate', function(){
 });
 
 // getting cities of state
+$app->post('/city/gathercitybyname', function(){
+	$cityCt = new CityController();
+	$cities = $cityCt->getByName();
+	echo $cities;
+	return $cities;
+});
+
+// getting cities of state
 $app->post('/person/fetchprofessionalsformap', function(){
 	$onlyThisRoles = isset($_POST['onlyThisRoles']) ? $_POST['onlyThisRoles'] : [];
 	$personCt = new PersonController();
@@ -231,4 +239,11 @@ $app->post('/message/sendmessage', function(){
 	$myWorks = $messageCt->sendMessage();
 	echo $myWorks;
 	return $myWorks;
+});
+
+$app->post('/person/verifyname', function(){
+	$personCt = new PersonController();
+	$response = $personCt->verifyUsageOfName();
+	echo $response;
+	return $response;
 });
