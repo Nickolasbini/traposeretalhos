@@ -223,6 +223,21 @@ class Person extends DataLayer
 	}
 
 	/**
+     * Get Person object correspondent to sent name
+     * @version 1.0 - 20211108
+     * @param  <string> the firstName - required
+     * @param  <string> the lastName  - required
+     * @return <obj> of Person or <null> 
+     */
+	public function getByName($firstName, $lastName)
+	{
+		$personObj = $this->find("firstName = :firstName and lastName = :lastName", "firstName=$firstName&$lastName=$lastName")
+		->limit(1)
+		->fetch(true);
+		return $personObj ? $personObj[0] : null;
+	}
+
+	/**
      * Method which validates the informed CPF format
      * @version 1.0 - 20210406
      * @param  <string> the CPF informed

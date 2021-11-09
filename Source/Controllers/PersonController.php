@@ -564,6 +564,7 @@ class PersonController
         ]);
     }
 
+    // verify if name is in use
     public function verifyUsageOfName()
     {
     	$nameToVerify = isset($_POST['name']) ? $_POST['name'] : null;
@@ -573,14 +574,30 @@ class PersonController
     			'message' => ucfirst(translate('no name sent')) 
     		]);
     	}
-    	if(strlen($nameToVerify) > 5){
+    	if(strlen($nameToVerify) < 5){
     		return json_encode([
     			'success' => false,
     			'message' => ucfirst(translate('name is too short')) 
     		]);
     	}
 
+    	$nameArray = explode(' ', $nameToVerify);
+    	$numberOfNames = count($nameArray);
+    	if($numberOfNames <= 1){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('must inform your full name'))
+    		]);
+    	}
+    	$lastName = $nameArray[$numberOfNames - 1];
+    	unset($nameArray[$numberOfNames - 1]);
+    	$firstName = implode(' ', $nameArray);
     	$personObj = new Person();
-    	$result = $personObj->getByName($nameToVerify);
+    	$result = $personObj->getByName($firstName, $lastName);
+    	return json_encode([
+    		'success' => true,
+    		'message' => !$result ? ucfirst(translate('name is not in use')) : ucfirst(translate('name is in use')),
+    		'isInUse' => $result ? true : false
+    	]);
     }
 }

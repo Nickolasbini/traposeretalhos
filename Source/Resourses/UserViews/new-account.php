@@ -504,11 +504,17 @@
 	    reader.readAsDataURL(input.files[0]);
 	};
 
+	var invalidWords = ['@', '#', '!', '?', '/', '|', ',', ';', '&', '*', '+', '-', '(', ')', ':', '.', ':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 	$('.fullName').on('input', function(){
-		$('.name-tip').hide();
+		var value = $(this).val();
+		value = value.charAt(value.length - 1);
+		for(i = 0; i < invalidWords.length; i++){
+			if(value == invalidWords[i]){
+				$('.name-tip').show();
+			}
+		}
 	});
 
-	var invalidWords = ['@', '#', '!', '?', '/', '|', ',', ';', '&', '*', '+', '-', '(', ')', ':', '.', ':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 	var dataNames = ['fullName', 'dateOfBirth', 'sex', 'cep', 'street', 'neighborhood', 'addressNumber', 'country', 'state', 'city', 'profilePhoto'];
 	$('.next-button-section-two').on('click', function(){
 		var hasNeededFields = true;
@@ -537,19 +543,20 @@
 					alert('name is too short, minimum length is five');
 					return;
 				}
-				for(o = 0; o < invalidWords.length; o++){
-					if(name.search(invalidWords[o]) != -1){
-						$(document).scrollTop($('.fullName'));
-						$('.fullName').focus();
-						$('.name-tip').show();
-						alert('invalid character in name');
-						return;
-					}
-				}
+				continue;
 			}
 			if(dataNames[i] == 'profilePhoto'){
 				accountData['profilePhoto'] = $('#selected-photo').attr('src');
 				continue;
+			}
+			if(dataNames[i] == 'dateOfBirth'){
+				var dateChosen = $('.dateOfBirth').val();
+				var age = calculateAge(new Date(dateChosen));
+				if(age <= 18){
+					alert('are you sure you can create an account?');
+					$(document).scrollTop('.dateOfBirth');
+					return;
+				}
 			}
 			accountData[dataNames[i]] = $('.'+dataNames[i]).val();
 		}
@@ -561,10 +568,11 @@
 			dataType: 'JSON',
 			success: function(response){
 				if(response.success == true){
-					var cityData = response.data;
-					var isoCodeOfCity = cityData.isoCode;
-					$('.cityISOCode-'+isoCodeOfCity).attr('selected', 'selected');
-					$('#cities-list').change();
+					if(response.isInUse == true){
+						alert('name is already in use, please try another one');
+						$(document).scrollTop('.fullName');
+						return;
+					}
 				}
 			}
 		});
@@ -599,8 +607,8 @@
 			return;
 		}
 
-		accountData['email']         = $('.email').val();
-		accountData['password']      = $('.password').val();
+		accountData['email']     = $('.email').val();
+		accountData['password']  = $('.password').val();
 
 
 
@@ -608,6 +616,13 @@
 	
 	function capitalize(text) {
 	    return text.charAt(0).toUpperCase() + text.slice(1);
+	}
+
+	// calculates the age from a date until now
+	function calculateAge(dob) { 
+	    var diff_ms = Date.now() - dob.getTime();
+	    var age_dt = new Date(diff_ms); 
+	    return Math.abs(age_dt.getUTCFullYear() - 1970);
 	}
 </script>
 
