@@ -28,6 +28,8 @@ class Person extends DataLayer
 	const NOT_VERIFIED_ACCOUNT = 1;
 	const VERIFIED_ACCOUNT 	   = 2;
 
+	const SEX_VALUES = ['M','F','U'];
+
 	// SETTERS
 	public function setName($name){
 		$this->name = $name;
@@ -97,6 +99,9 @@ class Person extends DataLayer
 	}
 	public function setState($state){
 		$this->state = $state;
+	}
+	public function setNeighborhood($neighborhood){
+		$this->neighborhood = $neighborhood;
 	}
 
 	// GETTERS
@@ -187,6 +192,10 @@ class Person extends DataLayer
 			return $stateObj;
 		}
 		return $this->state;
+	}
+	public function getNeighborhood()
+	{
+		return $this->neighborhood;
 	}
 
 	public function getFullName()

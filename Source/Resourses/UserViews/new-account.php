@@ -52,8 +52,7 @@
 			<div class="wrapper-of-content">
 				<div class="account-types">
 					<a class="item-of-type" data-role="serviceSuplier"><?php echo ucfirst(translate('service supplier')); ?></a>
-					<a class="item-of-type" data-role="storeOrSeller"><?php echo ucfirst(translate('store or seller')); ?></a>
-					<a class="item-of-type" data-role="client"><?php echo ucfirst(translate('client')); ?></a>
+					<a class="item-of-type" data-role=""><?php echo ucfirst(translate('client')); ?></a>
 				</div>
 				<h3 class="my-type-of-account" style="display: none;">I am a <h4 class="show-type-to-user"></h4></h3>
 				<h5 class="my-type-of-account-description">I like to inovate</h5>
@@ -179,9 +178,13 @@
 			<img title="<?php echo ucfirst(translate('this is your specialization type')) ?>" src="Source/Resourses/External/icons/seamstress.svg">
 		</div>
 		<div class="content-wrapper center-text account-types">
-			<a class="role-name" role-name-data="seamstress"><?php echo ucfirst(translate('seamstress')) ?></a>
-			<a class="role-name" role-name-data="tailor"><?php echo ucfirst(translate('tailor')) ?></a>
-			<a class="role-name" role-name-data="dressmaker"><?php echo ucfirst(translate('dressmaker')) ?></a>	
+			<?php
+				foreach(json_decode($roles, true) as $role){
+					if(!$role['isUsedOnMap'])
+						continue;
+			?>
+				<a class="role-name" role-id="<?= $role['id']; ?>" role-icon="<?= $role['iconUrl']; ?>"><?php echo ucfirst(translate($role['roleName'])) ?></a>
+			<?php } ?>
 		</div>
 		<div class="modal-options">
 			<a id="cancel" class="modal-options-buttons danger cancel-modal">
@@ -280,7 +283,7 @@
 	$('#account-type').addClass('selected-on-menu');
 	var userRole = null;
 	$('#save-user-role').on('click', function(){
-		userRole = $('.selected-button').attr('role-name-data');
+		userRole = $('.selected-button').attr('role-id');
 		if(userRole == null)
 			userRole = 'unknow';
 		$('#account-type').removeClass('selected-on-menu');
@@ -294,8 +297,8 @@
 		$(this).removeClass('not-selected');
 		if($('.role-name').hasClass('selected-button') == true)
 			return;
-		var roleName = $(this).attr('role-name-data');
-		$('.role-img-handle > img').attr('src', pathForImg+roleName+'.svg');
+		var roleIcon = $(this).attr('role-icon');
+		$('.role-img-handle > img').attr('src', pathForImg+roleIcon);
 		$('.role-img-handle').show();
 	});
 	$('.role-name').mouseout(function(){
@@ -309,9 +312,10 @@
 	});
 	// change the photo of worker icon by click on option
 	function changeIconOfWorker(roleNameElement = null){
-		var roleName = roleNameElement.attr('role-name-data');
-		$('.role-img-handle > img').attr('src', pathForImg+roleName+'.svg');
+		var roleIcon = roleNameElement.attr('role-icon');
+		$('.role-img-handle > img').attr('src', pathForImg+roleIcon);
 		$('.role-img-handle').show();
+		$(document).scrollTop($('#modal1').height());
 	}
 	// sets correspondent user accoun type
 	function handleViewsByType(typeOfUser){
@@ -333,7 +337,7 @@
 				$('#account-type').removeClass('selected-on-menu');
 				$('#personal-data').addClass('selected-on-menu');
 				$('#personal-data').click();
-				accountData['role'] = userRole;
+				accountData['role'] = null;
 			break;
 			default:
 				alert('an error occured');
@@ -422,7 +426,6 @@
 					if(data.numberOfStates > 0){
 						var statesOptions = '<option value="no option" selected="selected"><?php echo ucfirst(translate('plese, select your state')) ?></option>'
 						var states = data.content;
-						console.log(states);
 						for(i = 0; i < states.length; i++){
 							statesOptions += '<option class="stateName-'+states[i]['isoCode']+'" data-stateId="'+states[i]['id']+'" value="'+states[i]['isoCode']+'">'+states[i]['isoCode']+'</option>';
 						}
@@ -459,7 +462,6 @@
 					if(data.numberOfCities > 0){
 						var citiesOptions = '<option value="no option" selected="selected"><?php echo ucfirst(translate('plese, select your city')) ?></option>'
 						var cities = data.content;
-						console.log(cities);
 						for(i = 0; i < cities.length; i++){
 							citiesOptions += '<option class="cityISOCode-'+cities[i]['isoCode']+'" data-cityId="'+cities[i]['id']+'" value="'+cities[i]['name']+'">'+capitalize(cities[i]['regionName'])+'</option>';
 						}
@@ -486,6 +488,7 @@
 		});
 	});
 
+	var defaultImage = true;
 	$('#photo-chooser-input').on('input', function(){
 		openFile('selected-photo');
 	});
@@ -502,6 +505,7 @@
 	        output.src = dataURL;
 	    };
 	    reader.readAsDataURL(input.files[0]);
+	    defaultImage = false;
 	};
 
 	var invalidWords = ['@', '#', '!', '?', '/', '|', ',', ';', '&', '*', '+', '-', '(', ')', ':', '.', ':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -543,17 +547,22 @@
 					alert('name is too short, minimum length is five');
 					return;
 				}
+				accountData['fullName'];
 				continue;
 			}
 			if(dataNames[i] == 'profilePhoto'){
-				accountData['profilePhoto'] = $('#selected-photo').attr('src');
+				var imgSrc = null;
+				if(defaultImage == false){
+					imageSrc = $('#selected-photo').attr('src');
+				}
+				accountData['profilePhoto'] = imageSrc;
 				continue;
 			}
 			if(dataNames[i] == 'dateOfBirth'){
 				var dateChosen = $('.dateOfBirth').val();
 				var age = calculateAge(new Date(dateChosen));
 				if(age <= 18){
-					alert('are you sure you can create an account?');
+					alert('must be older than seventeen years old');
 					$(document).scrollTop('.dateOfBirth');
 					return;
 				}
@@ -564,7 +573,7 @@
 		$.ajax({
 			url: 'person/verifyname',
 			type: 'POST',
-			data: {name: accountData['fullName']},
+			data: {name: accountData.fullName},
 			dataType: 'JSON',
 			success: function(response){
 				if(response.success == true){
@@ -576,7 +585,6 @@
 				}
 			}
 		});
-
 		// calling next section		
 		removeFormerSection('section2');
 		$('#personal-data').removeClass('selected-on-menu');
@@ -610,8 +618,20 @@
 		accountData['email']     = $('.email').val();
 		accountData['password']  = $('.password').val();
 
-
-
+		$.ajax({
+			url: 'person/save',
+			type: 'POST',
+			data: {accountData: accountData},
+			dataType: 'JSON',
+			success: function(response){
+				if(response.success == true){
+					// open the confirmation informing an email will be sent
+				}else{
+					alert(response.message);
+					return;
+				}
+			}
+		});
 	});
 	
 	function capitalize(text) {

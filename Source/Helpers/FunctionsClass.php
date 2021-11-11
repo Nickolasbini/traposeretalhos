@@ -401,4 +401,37 @@ class FunctionsClass extends DataLayer
             return null;
         }
     }
+
+    /**
+     * perform a curl request
+     * @param  <array> of data such as: url, arrayValues, getMethod and aysncRequest
+     * @return string|null
+     */
+    public static function httpPost($parameters)
+    {
+        $url 	      = array_key_exists('url', $parameters) ? $parameters['url'] : null;
+        $getRequest   = array_key_exists('getRequest', $parameters) ? true : null;
+        $arrayValues  = array_key_exists('arrayValues', $parameters) ? $parameters['arrayValues'] : null;
+        $aysncRequest = array_key_exists('aysncRequest', $parameters) ? true : null;
+        if(!$url){
+        	return false;
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        if(!$getRequest){
+        	curl_setopt($ch, CURLOPT_POST, 1);
+		}
+		if(!$getRequest && $arrayValues){
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $arrayValues);
+		}else if($arrayValues){
+			$url .= '?';
+			foreach($arrayValues as $key => $val){
+				$url .= $key . '=' . $val . '&';
+			}
+			unset($url[strlen($url) - 1]);
+		}
+		$result = curl_exec($ch);
+		return $response;
+    }
 }

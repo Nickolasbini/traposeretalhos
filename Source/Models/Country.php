@@ -91,6 +91,15 @@ class Country extends DataLayer
 		return $countryObj ? $countryObj[0] : null;
 	}
 
+	// Document me
+	public function getCountryByName($name = '')
+	{
+		$countryObj = $this->find("name = :name", "name=$name")
+		->limit(1)
+		->fetch(true);
+		return $countryObj ? $countryObj[0] : null;
+	}
+
 	/**
      * Returns an array containing all data of country 
      * @version 1.0 - 20210418

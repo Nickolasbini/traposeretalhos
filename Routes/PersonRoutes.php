@@ -97,7 +97,7 @@ $app->get('/accountconfirmation/:emailwith:code', function($email, $code){
 $app->post('/person/save', function(){
 	$personCt = new PersonController();
 	// all parameters which it would use
-	$parameters = [
+	/*$parameters = [
 		'name' => 'Nickolas',
 		'lastName' => 'Alvaro Bini',
 		'dateOfBirth' => '2021-02-02',
@@ -114,9 +114,9 @@ $app->post('/person/save', function(){
 		'addressNumber' => 's',
 		'role' => ''
 
-	];
+	];*/
 
-	exit($personCt->save($parameters));
+	exit($personCt->save());
 });
 
 // remove a photo

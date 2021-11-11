@@ -27,6 +27,7 @@ $app->get('/newaccount', function(){
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
 	echo $userTemplate->render('new-account', [
 		'title' => ucfirst(translate('create account')),
-		'countries' => $countries
+		'countries' => $countries,
+		'roles' => $_SESSION['roles']
 	]);
 });

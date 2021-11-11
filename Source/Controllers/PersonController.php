@@ -8,10 +8,12 @@ use Source\Models\Country;
 use Source\Models\Person;
 use Source\Models\State;
 use Source\Models\City;
+use Source\Models\PersonPhoto;
 use Source\Models\PersonRecoveryData;
 use Source\Support\Mail;
 use Datetime;
 use DOMDocument;
+use Source\Controllers\PersonRoleController;
 
 /**
  * 
@@ -27,8 +29,20 @@ class PersonController
      * @return <array> keys <bool>   'success'
      *					    <string> 'message'
      */
-	public function save($savingParameters)
+	public function save()
 	{
+		$mail = new Mail();
+			$sendTo = ['nickolasbini@hotmail.com'];
+			/*$attachment[] = [
+				'Logo' => 'logo-CosU-top.jpg'
+			];*/
+			$newCode = '131';
+			$title   = ucfirst(translate('your authentification token'));
+			$message = ucfirst(translate('<a href="'.$_SERVER['REQUEST_URI'].'/accountconfirmation/nickolasbini@hotmail.comwith 14141">this is your code')).' '.$newCode.'</a>'; 
+			$response = $mail->sendMail($sendTo, $title, $message);
+
+			return json_encode($response);
+		$savingParameters = isset($_POST['accountData']) ? json_decode($_POST['accountData'], true) : null;
 		if(is_null($savingParameters) || !is_array($savingParameters)){
 			return json_encode([
 				'success' => false,
@@ -58,27 +72,53 @@ class PersonController
 				'message' => ucfirst(translate('email is already in use'))
 			]);
 		}
+		$languageObj = new Language();
+		$languageISO = $_SESSION['userLanguage'];
+		$languageObj = $languageObj->getLanguageByIsoCode(strtoupper($languageISO));
+		if(is_null($languageObj)){
+			return json_encode([
+				'success' => false,
+				'message' => ucfirst(translate('invalid language id'))
+			]);
+		}
+		$personObj->setLanguage($languageObj->getId());
 		foreach($savingParameters as $parameterName => $value){
 			$setMethod = 'set'.ucfirst($parameterName);
 			if($parameterName == 'country'){
 				$countryObj = new Country();
-				$countryObj = $countryObj->findById($value);
+				$countryObj = $countryObj->getCountryByName($value);
 				if(is_null($countryObj)){
 					return json_encode([
 						'success' => false,
 						'message' => ucfirst(translate('invalid country id'))
 					]);
 				}
+				$personObj->setCountry($countryObj->getId());
+				continue;
 			}
-			if($parameterName == 'language'){
-				$languageObj = new Language();
-				$languageObj = $languageObj->findById($value);
-				if(is_null($languageObj)){
+			if($parameterName == 'state'){
+				$stateObj = new State();
+				$stateObj = $stateObj->getStateByIsoCode($value);
+				if(is_null($stateObj)){
 					return json_encode([
 						'success' => false,
-						'message' => ucfirst(translate('invalid language id'))
+						'message' => ucfirst(translate('invalid state id'))
 					]);
 				}
+				$personObj->setState($stateObj->getId());
+				continue;
+			}
+			if($parameterName == 'city'){
+				$cityObj = new City();
+				$cityObj = $cityObj->getCityByName($value);
+				if(is_null($cityObj)){
+					return json_encode([
+						'success' => false,
+						'message' => ucfirst(translate('invalid city id'))
+					]);
+				}
+				$personObj->setCity($cityObj->getId());
+				continue;
 			}
 			if($parameterName == 'password'){
 				$value = FunctionsClass::generateHashValue($savingParameters['password']);
@@ -92,8 +132,61 @@ class PersonController
 					]);	
 				}
 			}
+			if($parameterName == 'fullName'){
+				$nameArray = explode(' ', $value);
+				$position = count($nameArray) - 1;
+				$lastName = $nameArray[$position];
+				unset($nameArray[$position]);
+				$firstName = implode(' ', $nameArray);
+				$personObj->setName($firstName);
+				$personObj->setLastName($lastName);
+				continue;
+			}
+			if($parameterName == 'role'){
+				if($value){
+					$personRoleCt = new PersonRoleController;
+					dd($personRoleCt);
+					$personObj->setHasRole(true);
+					continue;
+				}
+				continue;
+			}
+			if($parameterName == 'street'){
+				$personObj->setAddress($value);
+				continue;
+			}
+			if($parameterName == 'sex'){
+				$allSex = Person::SEX_VALUES;
+				$value = strtoupper($value);
+				if(!in_array($value, $allSex)){
+					return json_encode([
+						'success' => false,
+						'message' => ucfirst(translate('invalid sex'))
+					]);
+				}
+				$personObj->setAddress($value);
+				continue;
+			}
+			if($parameterName == 'neighborhood'){
+				$personObj->setNeighborhood($value);
+				continue;
+			}
+			if($parameterName == 'profilePhoto'){
+				if($value){
+					$personPhotoObj = new PersonPhoto();
+					$result = $personPhotoObj->savePersonPhoto(null, $personObj);
+					if(!$result){
+						return json_encode([
+							'success' => false,
+							'message' => 'could not save photo'
+						]);
+					}
+				}
+				continue;
+			}
 			$personObj->{$setMethod}($value);
 		}
+		// finish the parameters such as state
 		$result = $personObj->save();
 		if(!$result){
 			return json_encode([
