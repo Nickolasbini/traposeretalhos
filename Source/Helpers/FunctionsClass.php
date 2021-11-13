@@ -434,4 +434,9 @@ class FunctionsClass extends DataLayer
 		$result = curl_exec($ch);
 		return $response;
     }
+
+    public static function getBasePath()
+    {
+    	return $_SERVER['HTTP_HOST'].'/'.URL['urlDomain'].'/';
+    }
 }

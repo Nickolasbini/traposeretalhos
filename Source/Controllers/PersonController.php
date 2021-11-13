@@ -31,18 +31,7 @@ class PersonController
      */
 	public function save()
 	{
-		$mail = new Mail();
-			$sendTo = ['nickolasbini@hotmail.com'];
-			/*$attachment[] = [
-				'Logo' => 'logo-CosU-top.jpg'
-			];*/
-			$newCode = '131';
-			$title   = ucfirst(translate('your authentification token'));
-			$message = ucfirst(translate('<a href="'.$_SERVER['REQUEST_URI'].'/accountconfirmation/nickolasbini@hotmail.comwith 14141">this is your code')).' '.$newCode.'</a>'; 
-			$response = $mail->sendMail($sendTo, $title, $message);
-
-			return json_encode($response);
-		$savingParameters = isset($_POST['accountData']) ? json_decode($_POST['accountData'], true) : null;
+		$savingParameters = isset($_POST['accountData']) ? $_POST['accountData'] : null;
 		if(is_null($savingParameters) || !is_array($savingParameters)){
 			return json_encode([
 				'success' => false,
@@ -145,7 +134,6 @@ class PersonController
 			if($parameterName == 'role'){
 				if($value){
 					$personRoleCt = new PersonRoleController;
-					dd($personRoleCt);
 					$personObj->setHasRole(true);
 					continue;
 				}
@@ -172,16 +160,6 @@ class PersonController
 				continue;
 			}
 			if($parameterName == 'profilePhoto'){
-				if($value){
-					$personPhotoObj = new PersonPhoto();
-					$result = $personPhotoObj->savePersonPhoto(null, $personObj);
-					if(!$result){
-						return json_encode([
-							'success' => false,
-							'message' => 'could not save photo'
-						]);
-					}
-				}
 				continue;
 			}
 			$personObj->{$setMethod}($value);
@@ -195,9 +173,20 @@ class PersonController
 			]);
 		}
 
+		$personId = $personObj->data->id;
+		if($savingParameters['profilePhoto']){
+			$personPhotoObj = new PersonPhoto();
+			$result = $personPhotoObj->savePersonPhoto($personId, $personObj, $savingParameters['profilePhoto'], 'users');
+			if(!$result){
+				return json_encode([
+					'success' => false,
+					'message' => 'could not save photo'
+				]);
+			}
+		}
+
 		// Gathering PersonRecoveryData information
 		$personRecoveryDataWk = new PersonRecoveryData();
-		$personId = $personObj->data->id;
 		$result = $personRecoveryDataWk->saveRecoveryData($personId);
 		if(!$result['saveResponse']){
 			$personObj->remove();
@@ -217,9 +206,9 @@ class PersonController
 				'Logo' => 'logo-CosU-top.jpg'
 			];*/
 			$title   = ucfirst(translate('your authentification token'));
-			$message = ucfirst(translate('<a href="'.$_SERVER['REQUEST_URI'].'/accountconfirmation/'.$savingParameters['email'].'with'.$newCode.'">this is your code')).' '.$newCode.'</a>'; 
+			$message = '<a href="'.FunctionsClass::getBasePath().'accountconfirmation/'.md5($savingParameters['email']).'with'.$newCode.'with'.$personId.'">'.ucfirst(translate('this is your code')).' '.$newCode.'</a>'; 
 			$mail->sendMail($sendTo, $title, $message);
-			FunctionsClass::writeToCode('codes.txt', $newCode, $savingParameters['email']);
+			FunctionsClass::writeToCode('codes.txt', $newCode, md5($savingParameters['email']));
 		}
 
 		$message = $isUpdate ? ucfirst(translate('updated with success')) 
@@ -241,15 +230,15 @@ class PersonController
      * @return <array> keys <bool>   'success'
      *					    <string> 'message'
      */
-	public function verifyAccountEmail($email = null, $code = null)
+	public function verifyAccountEmail($email = null, $code = null, $personId = null)
 	{
-		if(is_null($email) || is_null($code)){
+		if(is_null($email) || is_null($code) | is_null($personId)){
 			return json_encode([
 				'success' => false,
 				'message' => ucfirst(translate('invalid email or code'))
 			]);	
 		}
-		$codesFile = $this->getContents('codes.txt');
+		$codesFile = json_decode(file_get_contents(TMPPATH['tmp'].'codes.txt'), true);
 		if(!array_key_exists($email, $codesFile)){
 			return json_encode([
 				'success' => false,
@@ -270,7 +259,7 @@ class PersonController
 			]);
 		}
 		$personObj = new Person();
-		$person = $personObj->getByEmail($email);
+		$person = $personObj->findById($personId);
 		$person->setStatus(PERSON::VERIFIED_ACCOUNT);
 		$result = $person->save();
 		if(!$result){
@@ -279,7 +268,7 @@ class PersonController
 				'message' => ucfirst(translate('saving error, try again later'))
 			]);
 		}
-		FunctionsClass::removeFromCode($email);
+		FunctionsClass::removeFromCode(md5($email));
 		return json_encode([
 			'success' => true,
 			'message' => ucfirst(translate('account verified, be welcome to ').APP['appName'])

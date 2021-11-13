@@ -48,7 +48,7 @@ class PersonPhoto extends DataLayer
 	// this saves the relation of the Person with a Photo
 	// by calling the saveDocuments it creates either the 'file'
 	// and the Document obj, relating both Document and Post 
-	public function savePersonPhoto($personId, $personObj = null)
+	public function savePersonPhoto($personId, $personObj = null, $photo = null, $directoryName = null)
 	{
 		if(is_null($personId) && !$personObj)
 			return json_encode([
@@ -67,8 +67,8 @@ class PersonPhoto extends DataLayer
                 'message' => ucfirst(translate('invalid id')),
            ]); 
 		$documentObj = new Document();
-		$responseIds = $documentObj->saveDocuments();
-		$postPhotosSavedIds = [];
+		$responseIds = $documentObj->saveDocuments($photo, $directoryName);
+		$personPhotosSavedIds = [];
 		$mainProfilePhoto = true;
 		foreach($responseIds as $documentId){
 			$personPhotoObj = new PersonPhoto();

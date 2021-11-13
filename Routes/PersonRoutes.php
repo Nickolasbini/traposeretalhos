@@ -87,35 +87,19 @@ $app->post('/login', function(){
 	exit;
 });
 
-$app->get('/accountconfirmation/:emailwith:code', function($email, $code){
+$app->get('/accountconfirmation/:data', function($data){
+	$dataArray = explode('with', $data);
+	$email = $dataArray[0];
+	$code  = $dataArray[1];
+	$personId = $dataArray[2];
 	$personCt = new PersonController();
-	$result = $personCt->verifyAccountEmail($email, $code);
+	$result = $personCt->verifyAccountEmail($email, $code, $personId);
 	exit($result);
 });
 
 // Person create/edit
 $app->post('/person/save', function(){
 	$personCt = new PersonController();
-	// all parameters which it would use
-	/*$parameters = [
-		'name' => 'Nickolas',
-		'lastName' => 'Alvaro Bini',
-		'dateOfBirth' => '2021-02-02',
-		'email' => 'tete@hotmail.com',
-		'password' => 'nica21',
-		'language' => '15',
-		'country' => '32',
-		'state' => '1',
-		'city' => '2',
-		'aboutMe' => '',
-		'skills' => '',
-		'cep' => '1',
-		'address' => '',
-		'addressNumber' => 's',
-		'role' => ''
-
-	];*/
-
 	exit($personCt->save());
 });
 

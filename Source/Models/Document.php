@@ -5,6 +5,7 @@ namespace Source\Models;
 use Source\Helpers\FunctionsClass;
 
 use CoffeeCode\DataLayer\DataLayer;
+use DateTime;
 
 /**
  * 
@@ -49,8 +50,42 @@ class Document extends DataLayer
 	}
 
 	// saves all sent photos and retunrs the path for it
-	public function saveFiles()
+	public function saveFiles($photo = null, $directoryName = null)
 	{
+		if($photo){
+			$response = [];
+			$data = explode(',', $photo);
+			if(!is_array($data) || count($data) == 1){
+				return [];
+			}
+			$info = $data[0];
+			$extension = str_replace(['data:image/', ';base64'], '', $info);
+			$photo = $data[1];
+
+			$imageData = base64_decode($photo);
+			$source = imagecreatefromstring($imageData);
+			
+			$currentDateTime = strtotime((new DateTime())->format('Y-m-dh:i:s'));
+			// generating a random file name
+			$fileName = FunctionsClass::generateRandomValue().'-'.$currentDateTime.'.jpeg';
+			$dir = $directoryName ? $directoryName.'/' : '';
+			if($dir && !file_exists(TMPPATH['images'].$dir)){
+				mkdir(TMPPATH['images'].$dir);
+			}
+			$filePath = TMPPATH['images'].$dir.$fileName;
+			$done = imagejpeg($source, $filePath);
+			if($done){
+				$response[] = [
+					'directory' => 'img',
+					'path'		=> TMPPATH['images'],
+					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$fileName,
+					'name'		=> $fileName
+				];
+			}
+			imagedestroy($source);
+			return $response;
+		}
+
 		$photos = $_FILES;
 		$allowedFormats = ['png' , 'jpeg', 'web', 'gif'];
 		$personId = isset($_SESSION['personId']) ? $_SESSION['personId'] : '';
@@ -67,7 +102,7 @@ class Document extends DataLayer
 			if(!in_array($extension, $allowedFormats))
 				continue;
 			// Creating new thumb image
-			$newImage = imagecreatetruecolor(256, 256);
+			
 			// cheking by the extension
 			switch ($extension) {
 				case 'png':
@@ -108,9 +143,9 @@ class Document extends DataLayer
 
 	// save documents from return of saveFiles method, which saves the file
 	// and return its path
-	public function saveDocuments()
+	public function saveDocuments($photoToSave = null, $directoryName = null)
 	{
-		$results = $this->saveFiles();
+		$results = $this->saveFiles($photoToSave, $directoryName);
 		$documentsIds = [];
 		foreach($results as $data){
 			$documentObj = new Document();

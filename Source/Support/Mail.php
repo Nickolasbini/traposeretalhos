@@ -15,7 +15,7 @@ class Mail
 
 	function __construct()
 	{
-		$this->mail = new PHPMailer();
+		$this->mail = new PHPMailer(true);
 		// Configuation
 		$this->mail->isSMTP();
 		$this->mail->SMTPAuth = true;
@@ -26,6 +26,7 @@ class Mail
 		$this->mail->Port = MAIL_CONFIGURATION['port'];
 		$this->mail->Username = MAIL_CONFIGURATION['user'];
 		$this->mail->Password = MAIL_CONFIGURATION['passwd'];
+		$this->mail->addCustomHeader('Importance', 'high');
 	}
 
 	/**

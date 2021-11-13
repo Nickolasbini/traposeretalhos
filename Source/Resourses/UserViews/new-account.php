@@ -332,15 +332,11 @@
 				$('#personal-data').click();
 				accountData['role'] = userRole;
 			break;
-			case 'client':
-				userRole = 'client';
+			default:
 				$('#account-type').removeClass('selected-on-menu');
 				$('#personal-data').addClass('selected-on-menu');
 				$('#personal-data').click();
 				accountData['role'] = null;
-			break;
-			default:
-				alert('an error occured');
 			break;
 		}
 	}
@@ -390,10 +386,6 @@
 	$('#personal-data').on('click', function(){
 		if($(this).hasClass('selected-on-menu') == false){
 			alert('you can not');
-			return;
-		}
-		if(userRole == null){
-			alert('something went wrong');
 			return;
 		}
 		removeFormerSection('personal-data');
@@ -547,11 +539,11 @@
 					alert('name is too short, minimum length is five');
 					return;
 				}
-				accountData['fullName'];
+				accountData['fullName'] = name;
 				continue;
 			}
 			if(dataNames[i] == 'profilePhoto'){
-				var imgSrc = null;
+				var imageSrc = null;
 				if(defaultImage == false){
 					imageSrc = $('#selected-photo').attr('src');
 				}
