@@ -62,80 +62,7 @@
 		
 	</section>
 
-	<footer>
-	<div class="footer-section-one" style="display: flex; flex-direction: column;">
-		<div class="footer-options" style="background: gray; display: flex; justify-content: center; background-image: url('Source/Resourses/External/icons/gray-background.jpg'); background-repeat: round;">
-			<img src="Source/Resourses/External/icons/logo-line&needle.svg">
-			<h1 style="margin-top: auto; margin-bottom: auto;"><?php echo APP['appName'] ?></h1>
-			<div class="footer-works-links" style="background: green; position: absolute; right: 6%;">
-				<ul class="links-options">
-					<li><a>contact us</a></li>
-					<li class="list-yellow-separator"></li>
-					<li><a>be a partner</a></li>
-					<li class="list-yellow-separator"></li>
-					<li><a>announce here</a></li>
-					<li class="list-yellow-separator"></li>
-				</ul>
-			</div>
-		</div>
-		<div class="social-media" style="background: pink; display: flex; justify-content: center;">
-			<a href="" class="contact-icon">
-				<img src="Source/Resourses/External/icons/email.svg">
-			</a>
-			<a href="" class="contact-icon">
-				<img src="Source/Resourses/External/icons/whatsapp.svg">
-			</a>
-			<a href="" class="contact-icon">
-				<img src="Source/Resourses/External/icons/instagram.svg">
-			</a>
-			<a href="" class="contact-icon">
-				<img src="Source/Resourses/External/icons/facebook.svg">
-			</a>
-		</div>
-		<div class="signature" style="background: yellow; text-align: center;">
-			© Copyright Cervo Digital. 2021
-		</div>
-
-	</div>
-
-	<br><br><br><br><br><br><br>
-
-		<div class="overlay-of-modal" style="display: none;"></div>
-		<div class="header-logo footer-logo">
-			<img src="Source/Resourses/External/icons/logo-line&needle.svg">
-			<h1 style="margin-right: 2%"><?php echo APP['appName'] ?></h1>
-			<div class="footer-works-links">
-				<ul class="links-options">
-					<li><a>contact us</a></li>
-					<li class="list-yellow-separator"></li>
-					<li><a>be a partner</a></li>
-					<li class="list-yellow-separator"></li>
-					<li><a>announce here</a></li>
-					<li class="list-yellow-separator"></li>
-				</ul>
-			</div>
-		</div>
-		<div class="contact-data">
-			<div class="media-contacts">
-				<a href="" class="contact-icon">
-					<img src="Source/Resourses/External/icons/email.svg">
-				</a>
-				<a href="" class="contact-icon">
-					<img src="Source/Resourses/External/icons/whatsapp.svg">
-				</a>
-				<a href="" class="contact-icon">
-					<img src="Source/Resourses/External/icons/instagram.svg">
-				</a>
-				<a href="" class="contact-icon">
-					<img src="Source/Resourses/External/icons/facebook.svg">
-				</a>
-			</div>
-			<div class="web-site-signature">
-				© Copyright Cervo Digital. 2021
-			</div>
-		</div>
-	</div>
-</footer>
+	<?php $this->insert('user-footer') ?>
 </body>
 
 <style type="text/css">
@@ -187,22 +114,9 @@
 	.small{
 		width: 20%;
 	}
-</style>
-
-<style type="text/css">
-	
-	.contact-icon > img{
-		width: 30px;
-	}
-
-	.footer-options > img{
-		width: 15%;
-		margin-left: -15%;
-		padding: 3%;
-	}
-
-	.footer-works-links{
-		right: 10%;
-		padding: 4%;
+	@media only screen and (max-width: 600px){
+		.top-horizontol > h1{
+			font-size: 1.2em;
+		}
 	}
 </style>

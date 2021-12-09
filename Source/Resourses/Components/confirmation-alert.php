@@ -52,10 +52,21 @@
 		$('.cancelbutton').text(cancelButtonMessage);
 		$('.confirmbutton').text(confirmButtonMessage);
 	}
-
+	// inserts custom IDs on confirm and cancel button
+	function setIds(cancelId = null, confirmId = null){
+		$('.cancelbutton').attr('id', cancelId);
+		$('.confirmbutton').attr('id', confirmId);
+	}
 	// cleans confirmation
 	function cleanConfirmationAlert(){
 		$('.confirmation-alert-title').text();
 		$('.confirmation-alert-message').text();
 	}
 </script>
+<style type="text/css">
+	@media only screen and (max-width: 600px) {
+		.confirmation-buttons{
+			width: 90%;
+		}
+	}
+</style>

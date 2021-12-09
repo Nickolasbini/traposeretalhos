@@ -33,6 +33,9 @@ class FunctionsClass extends DataLayer
 	// Document me
 	public static function getContents($fileName)
 	{
+		if(!file_exists(TMPPATH['tmp'].$fileName)){
+			file_put_contents(TMPPATH['tmp'].$fileName, '');
+		}
 		$result = file_get_contents(TMPPATH['tmp'].$fileName);
 		return $result ? json_decode($result, true) : false;
 	}
@@ -73,7 +76,7 @@ class FunctionsClass extends DataLayer
 	{
 		$currentDate = date("Y-m-d h:i:sa");
 		$file = FunctionsClass::getContents($fileName);
-		$file = !empty($file) ? $file : [];
+		$file = $file ? $file : [];
 		$file[$keyName] = [
 			'date' => $currentDate,
 			'code' => $code
@@ -438,5 +441,47 @@ class FunctionsClass extends DataLayer
     public static function getBasePath()
     {
     	return $_SERVER['HTTP_HOST'].'/'.URL['urlDomain'].'/';
+    }
+
+    public static function getCountryCorrectName($countryDataArray = [])
+    {
+    	if(count($countryDataArray) == 0)
+    		return null;
+    	$userLanguage = $_SESSION['userLanguage'];
+    	$translatedName = $countryDataArray['translation'][strtolower($userLanguage)];
+    	return $translatedName;
+    }
+
+    // perform a request via CURL, can be a GET or POST request with Parameters
+    // postValue must be an indexed array
+    public function sendRequest($parameters)
+    {
+    	$url = array_key_exists('url', $parameters) ? $parameters['url'] : null;
+    	if(!$url)
+    		return null;
+    	$requestValues  = array_key_exists('requestValues', $parameters)  ? $parameters['requestValues']  : null;
+    	$getMethod      = array_key_exists('getMethod', $parameters)   ? $parameters['getMethod']   : null;
+    	$asynRequest    = array_key_exists('asynRequest', $parameters) ? $parameters['asynRequest'] : null;
+    	$ch = curl_init();
+    	if($getMethod){
+    		$requestValues = is_array($requestValues) ? $requestValues : [$requestValues];
+    		$url .= '?';
+    		foreach($requestValues as $key => $value){
+    			$url .= $key . '=' . $value . '&';
+    		}
+    		unset($url[strlen($url) - 1]);
+    	}
+	    curl_setopt($ch, CURLOPT_URL, $url);
+	    curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
+	    if(!$getMethod){
+	    	curl_setopt($ch, CURLOPT_POST, 1);
+	    	curl_setopt($ch, CURLOPT_POSTFIELDS, $requestValues);
+	    }
+	    if($asynRequest){
+		    curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+		    curl_setopt($ch, CURLOPT_NOSIGNAL, 1);
+		}
+	    $result = curl_exec($ch);
+	    return $result;
     }
 }

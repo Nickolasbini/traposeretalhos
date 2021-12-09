@@ -34,7 +34,12 @@ class MessageController
             ]);
         }
         $messageObj = new Message();
-        $totalOfMessages = $messageObj->getByPerson($personId, true);
+        $isProfessional = isset($_SESSION['userRole']) ? $_SESSION['userRole'] : null;
+        if($isProfessional){
+            $totalOfMessages = $messageObj->getAllMessagesOfPerson($personId, true);
+        }else{
+            $totalOfMessages = $messageObj->getByPerson($personId, true);
+        }
         if(!$totalOfMessages){
             return json_encode([
                 'success' => false,
@@ -43,7 +48,11 @@ class MessageController
         }
         $pagerObj = new Paginator();
         $pagerObj->pager($totalOfMessages, 10, $page);
-        $messages = $messageObj->getByPerson($personId, null, $pagerObj->limit(), $pagerObj->offset());
+        if($isProfessional){
+            $messages = $messageObj->getAllMessagesOfPerson($personId, null, $pagerObj->limit(), $pagerObj->offset());
+        }else{
+            $messages = $messageObj->getByPerson($personId, null, $pagerObj->limit(), $pagerObj->offset());
+        }
         if(!$messages){
             return json_encode([
                 'success' => false,
@@ -51,19 +60,37 @@ class MessageController
             ]);
         }
         $elements = [];
+        $fatherElements = [];
         foreach($messages as $message){
-            $elements[] = [
+            $element = [
                 'id'             => $message->getId(),
                 'ownerOfMessage' => $message->getOwnerOfMessage(true),
                 'targetPerson'   => $message->getTargetPerson(true),
+                'firstMessage'   => $message->getFirstMessage(),
+                'fatherMessage'  => $message->getFatherMessage(),
+                'messageText'    => $message->getMessageText(),
+                'messageFile'    => $message->getMessageFile(),
                 'dateOfMessage'  => $message->getDateOfMessage(true),
             ];
+            $elements[] = $element;
+            if(is_null($message->getFatherMessage())){
+                $lastChild = $message->getLastChild();
+                $element['child'] = [];
+                if($lastChild){
+                    $element['child'] = [
+                        'messageText'   => $lastChild->getMessageText(),
+                        'dateOfMessage' => $lastChild->getDateOfMessage()
+                    ];
+                }
+                $fatherElements[] = $element; 
+            } 
         }
         // maybe parse to table
         return json_encode([
-            'success'  => true,
-            'message'  => ucfirst(translate('messages gathered')),
-            'messages' => $elements
+            'success'        => true,
+            'message'        => ucfirst(translate('messages gathered')),
+            'messages'       => $elements,
+            'fatherElements' => $fatherElements
         ]);
     }
 
@@ -77,6 +104,7 @@ class MessageController
         $targetPersonId   = isset($_POST['targetPersonId']) ? $_POST['targetPersonId'] : null;
         $messageFile      = isset($_FILES['messageFile']) ? $_FILES['messageFile'] : null;
         $messageText      = isset($_POST['messageText']) ? $_POST['messageText'] : null;
+        $hasPhoto         = isset($_POST['hasPhoto']) ? $_POST['hasPhoto'] : null;
         $fatherMessageId  = $_POST['fatherMessageId'];
         if(is_null($ownerOfMessageId) || is_null($targetPersonId) || (!$messageText && !$messageFile)){
             return json_encode([
@@ -187,7 +215,112 @@ class MessageController
             $_POST['fatherMessageId'] = null;
         }
         $response = $this->save();
-        exit($response);
+        return $response;
+    }
 
+    public function checkIfHasConversation()
+    {
+        $sessionPersonId = isset($_SESSION['personId'])    ? $_SESSION['personId']    : null;
+        $targetPersonId  = isset($_POST['targetPersonId']) ? $_POST['targetPersonId'] : null;
+        if(!$sessionPersonId || !$targetPersonId){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('no data to check'))
+            ]);
+        }
+        $messageObj = new Message();
+        $exists = $messageObj->verifyExistence($sessionPersonId, $targetPersonId);
+        return json_encode([
+            'success' => true,
+            'message' => ucfirst(translate('data gathered')),
+            'hasMessage' => $exists ? true : false,
+            'messageId'  => $exists ? $exists->getFatherMessage(true)->getId() : null
+        ]);
+    }
+
+    public function fetchDataById($fullChildData = true)
+    {
+        $fatherMessageId = isset($_POST['fatherMessageId']) ? $_POST['fatherMessageId'] : null;
+        $returnObj       = isset($_POST['returnObj']) ? $_POST['returnObj'] : null;
+        if(!$fatherMessageId){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('no message id sent'))
+            ]);
+        }
+        $messageObj = new Message();
+        $message = $messageObj->findById($fatherMessageId);
+        if($message->getFatherMessage()){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('invalid message type'))
+            ]);
+        }
+        $data[] = $message->getFullData(true);
+        $children = $message->getChildren();
+        if($returnObj){
+            $response = [
+                'father'   => $message,
+                'children' => $children
+            ];
+            return $response;
+        }
+        if(!is_null($children)){
+            foreach($children as $child){
+                $data[] = $child->getFullData($fullChildData);
+            }
+        }
+
+        return json_encode([
+            'success'          => true,
+            'message'          => ucfirst(translate('messages gathered')),
+            'numberOfMessages' => count($data),
+            'messages'         => $data
+        ]);
+    }
+
+    // fetches all Messages by the father message id and set them all to 'hasSeen = true' if it belongs to session PersonId
+    public function setMessageAsSeen()
+    {
+        $_POST['returnObj'] = true;
+        $result = $this->fetchDataById(null);
+        $objects = [];
+        $objects[] = $result['father'];
+        if($result['children']){
+            $objects = array_merge($objects, $result['children']);
+        }
+        $updatedMessages = 0;
+        foreach($objects as $messageObject){
+            $targetPersonId = $messageObject->getTargetPerson();
+            if($targetPersonId != $_SESSION['personId'])
+                continue;
+            $messageObject->setHasSeen(true);
+            $messageObject->save();
+            $updatedMessages++;
+        }
+        return json_encode([
+            'success'         => true,
+            'message'         => 'done',
+            'messagesUpdated' => $updatedMessages
+        ]);
+    }
+
+    public function getFatherMessageByPersonIds()
+    {
+        $personToLocate = isset($_POST['personToLocate']) ? $_POST['personToLocate'] : null;
+        $personId       = isset($_SESSION['personId'])    ? $_SESSION['personId']       : null;
+        if(!$personToLocate || !$personId){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('required parameters missing'))
+            ]);
+        }
+        $messageObj = new Message();
+        $message = $messageObj->locateFatherMessageByPersonIds($personId, $personToLocate);
+        return json_encode([
+            'success' => $message ? true : false,
+            'message' => ucfirst(translate('finished procedure')),
+            'content' => ($message ? $message->getFullData(false) : null)
+        ]);
     }
 }

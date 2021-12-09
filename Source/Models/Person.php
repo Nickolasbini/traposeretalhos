@@ -349,7 +349,7 @@ class Person extends DataLayer
      * @version 1.0 - 20210418
      * @return <array> of person data 
      */
-	public function getFullData()
+	public function getFullData($allData = true)
 	{
 		$dataArray = explode(' ', $this->getLastName());
 		if(is_array($dataArray)){
@@ -359,14 +359,15 @@ class Person extends DataLayer
 		}
 		$response = [
 			'id' 				=> $this->getId(),
-			'countryData' 		=> $this->getCountry(true)->getFullData(),
-			'language' 			=> $this->getLanguage(true)->getFullData(),
-			'cityData' 			=> $this->getCity(true)->getFullData(),
+			'countryData' 		=> $allData ? $this->getCountry(true)->getFullData() : $this->getCountry(),
+			'language' 			=> $allData ? $this->getLanguage(true)->getFullData() : $this->getLanguage(),
+			'cityData' 			=> $allData ? $this->getCity(true)->getFullData() : $this->getCity(),
 			'name' 				=> $this->getName(),
 			'lastName' 			=> $this->getLastName(),
 			'fullName'			=> $this->getFullName(),
 			'abbreviationName'  => $this->getName().' '.$personNameAbbreviation.'.',
 			'dateOfBirth' 		=> FunctionsClass::formatDate($this->getDateOfBirth()),
+			'not-formatted-date'=> $this->getDateOfBirth(),
 			'sex' 				=> $this->getSex(),
 			'sexIcon'			=> FunctionsClass::getSexIconFile($this->getSex()),
 			'email' 			=> $this->getEmail(),
@@ -382,11 +383,11 @@ class Person extends DataLayer
 			'personDescription' => $this->getPersonDescription(),
 			'personHabilities'  => $this->getPersonHabilities(),
 			'hasRole'			=> $this->getHasRole(),
-			'profilePhoto'		=> $this->getProfilePhoto(true),
-			'allPhotos'			=> $this->getProfilePhoto()
+			'profilePhoto'		=> $allData ? $this->getProfilePhoto(true) : null,
+			'allPhotos'			=> $allData ? $this->getProfilePhoto() : null
 		];
 		if($this->getHasRole()){
-			$response['role'] = $this->getPersonRole();
+			$response['role'] = $allData ? $this->getPersonRole() : true;
 		}
 		$elements = $response;
 		return $response;
@@ -476,14 +477,14 @@ class Person extends DataLayer
 			$personRole = $personRoleObj->getPersonRoleByPerson($person->getId());
 			if(is_null($personRole) || (!empty($onlyThisRoles) && !in_array($personRole->getRole(), $onlyThisRoles)) )
 				continue;
-			$elements = [
-				'latitude'  => $person->getLatitude(),
-				'longitude' => $person->getLongitude(),
-				'url'		=> PERSONALPAGE::BASE_URL.base64_encode($person->getId())
-			];
 			$personalPageObj = $personRole->getPersonalPage(true);
 			if(is_null($personalPageObj))
 				continue;
+			$elements = [
+				'latitude'  => $person->getLatitude(),
+				'longitude' => $person->getLongitude(),
+				'url'		=> PERSONALPAGE::BASE_URL.$personalPageObj->getId()
+			];
 			if(is_null($personalPageObj->getCompanyUnit())){
 				// Is a service offer
 				$elements['title'] = $person->getFullName();

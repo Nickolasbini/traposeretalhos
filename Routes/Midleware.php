@@ -1,7 +1,7 @@
 <?php
 
 use Source\Models\Person;
-
+use Source\Models\PersonActivity;
 use Source\Helpers\FunctionsClass;
 
 /**
@@ -13,7 +13,12 @@ class Midleware
 	{
 		$request = $_SERVER['REQUEST_URI'];
 		$request = str_replace('/'.URL['urlDomain'], '', $request);
-		$routesToVerify = ['/post/save', '/message/listmessages'];
+		$_SESSION['currentRoute'] = $request;
+		$routesToIgnore = ['/personactivity/updateandcheckpersonactivities'];
+		if(in_array($request, $routesToIgnore)){
+			return true;
+		}
+		$routesToVerify = ['/post/save', '/message/listmessages', '/personalpage/addwork', '/person/updatesomedata', '/messages', '/favorites', '/person/editbyfield', '/person/updatesomedata'];
 		foreach($routesToVerify as $routeName){
 			if($request == $routeName){
 				$result = Midleware::tryToLogin();
@@ -26,6 +31,17 @@ class Midleware
 		      	break;
 			}
 		}
+		if(FunctionsClass::isPersonLoggedIn()){
+			$requestParameters = [
+				'url' 	        => URL['realPath'] . '/personactivity/updateandcheckpersonactivities',
+				'requestValues' => [
+					'personId'     => $_SESSION['personId'],
+					'currentRoute' => $request 
+				], 
+				'asynRequest' => true
+			];
+			FunctionsClass::sendRequest($requestParameters);
+      	}
       	return true;
 	}
 
@@ -47,6 +63,7 @@ class Midleware
 		// try to find by cookie
 		if(isset($_COOKIE['authenticationToken']) && !is_null($_COOKIE['authenticationToken'])){
 			$person = $personObj->getByAuthenticationToken($_COOKIE['authenticationToken']);
+			$person = $person ? $person[0] : null;
 			if($person && $person->getStatus() != PERSON::NOT_VERIFIED_ACCOUNT){
 				// set session variables
 				FunctionsClass::setPersonSession($person);
@@ -60,6 +77,10 @@ class Midleware
 		// try to find by email
 		$email    = isset($_POST['email']) ? $_POST['email'] : null;
 		$password = isset($_POST['password']) ? $_POST['password'] : null;
+		if(!$email && !$password){
+			$email    = isset($_GET['email']) ? $_GET['email'] : null;
+			$password = isset($_GET['email']) ? $_GET['email'] : null;
+		}
 		if(!is_null($email) && !is_null($password)){
 			$person = $personObj->getByEmail($email);
 			if($person && $person->getStatus() != PERSON::NOT_VERIFIED_ACCOUNT){
@@ -97,8 +118,13 @@ class Midleware
 	}
 
 	// check if cookie of login exists, else tries to login
-	public static function verifyLogin()
+	public static function checkAvaliableFeatures()
 	{
-		
+		$currentRoute = $_SERVER['REQUEST_URI'];
+		$restrictedRoutes = ['/'.URL['urlDomain'].'/courses'];
+		if(!ALL_FEATURES && in_array($currentRoute, $restrictedRoutes)){
+			header('Location: /'.URL['urlDomain']);
+			exit();
+		}
 	}
 }

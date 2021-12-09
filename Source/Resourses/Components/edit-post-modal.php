@@ -1,7 +1,7 @@
 <div id="modal3" class="modal">
     <div class="modal-data content-of-modal">
     	<div class="modal-header">
-        	<span class="close-post-edition" title="<?php echo ucfirst(translate('close')) ?>">&times;</span>
+        	<span class="close-post-edition" style="margin-left: -10%" title="<?php echo ucfirst(translate('close')) ?>">&times;</span>
 			<h2 class="center-text"><?php echo ucfirst(translate('edit post')) ?></h2>
 		</div>
 		<div class="wrapper-of-inputs">
@@ -12,7 +12,7 @@
 			<label for="description-of-text">Edit description of post</label>
 			<textarea id="description-of-text" class="inputs-of-post-modal center-text"></textarea>
 		</div>
-		<div class="wrapper-of-inputs">
+		<div class="wrapper-of-inputs" style="display: none;">
 			<label class="photos-of-post">Edit photo</label>
 			<textarea class="edit-post-content center-text" class="inputs-of-post-modal center-text"></textarea>
 		</div>
@@ -64,20 +64,33 @@
 	});
 	$(document).off("click", "#save-post-update");
 	$(document).on("click","#save-post-update",function(){
-		var edditedPost = $('.edit-post-content').val();
+		openLoader();
+		var description = $('#description-of-text').val();
+		var postTitleValue = $('#title-of-text').val();
 		$.ajax({
 			url: 'post/save',
 			type: 'POST',
-			data: {id: postId, postTitle: postTitleValue, postDescription: edditedPost},
+			data: {id: postId, postTitle: postTitleValue, postDescription: description},
 			success: function(data){
 				data = data.replace('70', '');
 				result = JSON.parse(data);
 		    	if(result['success'] == true){
+		    		var posts = $('.post-card');
+		    		var updatedData = result['post'];
+		    		posts.each(function(){
+		    			if($(this).attr('data-post-id') == postId){
+		    				$(this).find('.title-of-post-card').text(updatedData['postTitle']);
+		    				$(this).find('.post-text').text(updatedData['postDescription']);
+		    			}
+		    		});
 		    		closeModal('modal3');
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}else{
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 	});

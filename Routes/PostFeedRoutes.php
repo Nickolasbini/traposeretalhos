@@ -2,13 +2,16 @@
 use Source\Controllers\CategoryController;
 use Source\Controllers\PostController;
 use Source\Controllers\CommentController;
+use Source\Controllers\FavoriteController;
 use Source\Helpers\FunctionsClass;
 use Source\Models\PostPhoto;
 
 // Maybe here create a method to valite login
 $app->get('/posts', function(){
+	$categoryCt = new CategoryController();
+	$categories = $categoryCt->getAll(true);
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
-	echo $userTemplate->render('post-management');
+	echo $userTemplate->render('post-management', ['categories' => $categories]);
 });
 
 $app->get('/news', function(){
@@ -16,7 +19,7 @@ $app->get('/news', function(){
 	$postCt = new PostController();
 	$response = json_decode($postCt->gatherPosts($page), true);
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
-	echo $userTemplate->render('news', ['posts' => $response['content'], 'pages' => $response['page']]);
+	echo $userTemplate->render('news', ['posts' => $response['content'], 'pages' => $response['page'], 'message' => $response['message']]);
 });
 
 $app->get('/category/save', function(){
@@ -36,7 +39,8 @@ $app->post('/post/save', function(){
 		'id'			  => isset($_POST['id']) 			  ? $_POST['id'] : null,
 		'category' 		  => isset($_POST['category']) 		  ? $_POST['category'] : null,
 		'postTitle'       => isset($_POST['postTitle']) 	  ? $_POST['postTitle'] : null,
-		'postDescription' => isset($_POST['postDescription']) ? $_POST['postDescription'] : null
+		'postDescription' => isset($_POST['postDescription']) ? $_POST['postDescription'] : null,
+		'postPhoto'	      => isset($_POST['postPhoto'])       ? $_POST['postPhoto'] : null
 	];
 	$result = $postCt->save($parameters);
 	exit($result);
@@ -59,7 +63,7 @@ $app->post('/post/getdata', function(){
 $app->post('/comment/save', function(){
 	if(!FunctionsClass::isPersonLoggedIn()){
 		$errorMessage = ucfirst(translate('please, log in first'));
-		$_SESSION['messages'] = $errorMessage;
+		$_SESSION['messageToDisplay'] = $errorMessage;
 		echo json_encode([
 			'success' => false,
 			'performLogin' => true,
@@ -125,7 +129,7 @@ $app->post('/comment/gettotalofcomment', function(){
 $app->post('/comment/managelikes', function(){
 	if(!FunctionsClass::isPersonLoggedIn()){
 		$errorMessage = ucfirst(translate('please, log in first'));
-		$_SESSION['messages'] = $errorMessage;
+		$_SESSION['messageToDisplay'] = $errorMessage;
 		echo json_encode([
 			'success' => false,
 			'performLogin' => true,
@@ -145,6 +149,27 @@ $app->post('/comment/managelikes', function(){
 	}
 	$commentCt = new CommentController();
 	$result = $commentCt->updateCommentLikes($commentId, $add);
+	echo $result;
+	return;
+});
+
+$app->post('/favorite/save', function(){
+	$favoriteCt = new FavoriteController();
+	$result = $favoriteCt->save();
+	echo $result;
+	return;
+});
+
+$app->post('/favorite/remove', function(){
+	$favoriteCt = new FavoriteController();
+	$result = $favoriteCt->remove();
+	echo $result;
+	return;
+});
+
+$app->post('/favorite/list', function(){
+	$favoriteCt = new FavoriteController();
+	$result = $favoriteCt->list();
 	echo $result;
 	return;
 });

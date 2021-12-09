@@ -9,6 +9,7 @@ use Source\Models\Person;
 use Source\Models\State;
 use Source\Models\City;
 use Source\Models\PersonPhoto;
+use Source\Models\PersonRole;
 use Source\Models\PersonRecoveryData;
 use Source\Support\Mail;
 use Datetime;
@@ -54,23 +55,27 @@ class PersonController
 			$isUpdate = true;
 		}
 		// Verify if email is in use
-		$isInUse = $personObj->getByEmail($savingParameters['email']);
-		if($isInUse && !$isUpdate){
-			return json_encode([
-				'success' => false,
-				'message' => ucfirst(translate('email is already in use'))
-			]);
+		if(array_key_exists('email', $savingParameters)){
+			$isInUse = $personObj->getByEmail($savingParameters['email']);
+			if($isInUse && !$isUpdate){
+				return json_encode([
+					'success' => false,
+					'message' => ucfirst(translate('email is already in use'))
+				]);
+			}
 		}
-		$languageObj = new Language();
-		$languageISO = $_SESSION['userLanguage'];
-		$languageObj = $languageObj->getLanguageByIsoCode(strtoupper($languageISO));
-		if(is_null($languageObj)){
-			return json_encode([
-				'success' => false,
-				'message' => ucfirst(translate('invalid language id'))
-			]);
+		if(!$isUpdate){
+			$languageObj = new Language();
+			$languageISO = $_SESSION['userLanguage'];
+			$languageObj = $languageObj->getLanguageByIsoCode(strtoupper($languageISO));
+			if(is_null($languageObj)){
+				return json_encode([
+					'success' => false,
+					'message' => ucfirst(translate('invalid language id'))
+				]);
+			}
+			$personObj->setLanguage($languageObj->getId());
 		}
-		$personObj->setLanguage($languageObj->getId());
 		foreach($savingParameters as $parameterName => $value){
 			$setMethod = 'set'.ucfirst($parameterName);
 			if($parameterName == 'country'){
@@ -123,6 +128,12 @@ class PersonController
 			}
 			if($parameterName == 'fullName'){
 				$nameArray = explode(' ', $value);
+				if(!is_array($nameArray) || count($nameArray) == 1){
+					return json_encode([
+						'success' => false,
+						'message' => ucfirst(translate('enter your full name'))
+					]);	
+				}
 				$position = count($nameArray) - 1;
 				$lastName = $nameArray[$position];
 				unset($nameArray[$position]);
@@ -152,7 +163,7 @@ class PersonController
 						'message' => ucfirst(translate('invalid sex'))
 					]);
 				}
-				$personObj->setAddress($value);
+				$personObj->setSex($value);
 				continue;
 			}
 			if($parameterName == 'neighborhood'){
@@ -174,13 +185,24 @@ class PersonController
 		}
 
 		$personId = $personObj->data->id;
-		if($savingParameters['profilePhoto']){
+		if(array_key_exists('profilePhoto', $savingParameters) && $savingParameters['profilePhoto']){
 			$personPhotoObj = new PersonPhoto();
 			$result = $personPhotoObj->savePersonPhoto($personId, $personObj, $savingParameters['profilePhoto'], 'users');
 			if(!$result){
 				return json_encode([
 					'success' => false,
 					'message' => 'could not save photo'
+				]);
+			}
+		}
+
+		if(array_key_exists('role', $savingParameters) && $savingParameters['role']){
+			$personRoleObj = new PersonRoleController();
+			$result = $personRoleObj->save(['role' => $savingParameters['role'], 'person' => $personId]);
+			if(!$result){
+				return json_encode([
+					'success' => false,
+					'message' => 'could not create role'
 				]);
 			}
 		}
@@ -202,19 +224,21 @@ class PersonController
 			// send email
 			$mail = new Mail();
 			$sendTo = [$savingParameters['email']];
-			/*$attachment[] = [
-				'Logo' => 'logo-CosU-top.jpg'
-			];*/
+			$attachment = [
+				'Logo' => 'Source/Resourses/External/icons/logo-line&needle.svg'
+			];
 			$title   = ucfirst(translate('your authentification token'));
-			$message = '<a href="'.FunctionsClass::getBasePath().'accountconfirmation/'.md5($savingParameters['email']).'with'.$newCode.'with'.$personId.'">'.ucfirst(translate('this is your code')).' '.$newCode.'</a>'; 
-			$mail->sendMail($sendTo, $title, $message);
+			$message = '<h1>'.ucfirst(translate('be welcome to '. APP['appName'])).'</h1>';
+			$message .= '<h2>'.ucfirst(translate('verify your account by clicking on the link below')).'</h2>';
+			$message .= '<a href="'.FunctionsClass::getBasePath().'accountconfirmation/'.md5($savingParameters['email']).'with'.$newCode.'with'.$personId.'">'.$newCode.'</a>'; 
+			$mail->sendMail($sendTo, $title, $message, $attachment);
 			FunctionsClass::writeToCode('codes.txt', $newCode, md5($savingParameters['email']));
 		}
 
 		$message = $isUpdate ? ucfirst(translate('updated with success')) 
 		                     : ucfirst(translate('an email has been sent to')).':'.$savingParameters['email'];
 		if(array_key_exists('differentIp', $result)){
-			$personRecoveryDataWk->sendDifferentIpMail($savingParameters['email']);
+			//$personRecoveryDataWk->sendDifferentIpMail($savingParameters['email']);
 		}
 		return json_encode([
 			'success'   => true,
@@ -242,7 +266,7 @@ class PersonController
 		if(!array_key_exists($email, $codesFile)){
 			return json_encode([
 				'success' => false,
-				'message' => ucfirst(translate('email is invalid'))
+				'message' => ucfirst(translate('account not found'))
 			]);
 		}
 		if($codesFile[$email]['code'] != $code){
@@ -268,7 +292,12 @@ class PersonController
 				'message' => ucfirst(translate('saving error, try again later'))
 			]);
 		}
-		FunctionsClass::removeFromCode(md5($email));
+		// login into account
+		$email    = $person->getEmail();
+		$password = $person->getPassword();
+		$this->login($email, $password, true);
+
+		FunctionsClass::removeFromCode($email);
 		return json_encode([
 			'success' => true,
 			'message' => ucfirst(translate('account verified, be welcome to ').APP['appName'])
@@ -280,10 +309,11 @@ class PersonController
      * @version 1.0 - 20210406
      * @param  <string> the email 
      * @param  <string> the password
+     * @param  <bool>   if password is already hashed
      * @return <array> keys <bool>   'success'
      *					    <string> 'message'
      */
-	public function login($email = null, $password = null)
+	public function login($email = null, $password = null, $passwordIsHashed = null)
 	{
 		if(is_null($email) || is_null($password)){
 			return json_encode([
@@ -300,7 +330,7 @@ class PersonController
 			]);
 		}
 		$personPassword = $person->getPassword();
-		$password = FunctionsClass::generateHashValue($password);
+		$password = is_null($passwordIsHashed) ? FunctionsClass::generateHashValue($password) : $password;
 		if($personPassword != $password){
 			return json_encode([
 				'success' => false,
@@ -319,9 +349,18 @@ class PersonController
 		$authenticationToken = FunctionsClass::setPersonCookie();
 		$person->setAuthenticationToken($authenticationToken);
 		$person->save();
+		if($person->getHasRole()){
+			$personRoleObj = new PersonRole();
+			$personRole = $personRoleObj->getPersonRoleByPerson($person->getId());
+			if($personRole){
+				$personalPage = $personRole->getPersonalPage(true);
+				$pageURL = $personalPage->getPageURL() . $personalPage->getId();
+				$_SESSION['pageURL'] = $pageURL;
+			}
+		}
 		return json_encode([
 			'success' => true,
-			'message' => ucfirst(translate('acces granted, be welcome'))
+			'message' => ucfirst(translate('access granted, be welcome'))
 		]);
 	}
 
@@ -590,7 +629,8 @@ class PersonController
 		foreach($doNotReturn as $keyName){
 			unset($dataFromPerson[$keyName]);
 		}
-		$dataFromPerson = $dataFromPerson;
+		$countryName = FunctionsClass::getCountryCorrectName($dataFromPerson['countryData']);
+		$dataFromPerson['fullAddress'] = $dataFromPerson['address'] . ' ' . $dataFromPerson['addressNumber'] . ' ' . $dataFromPerson['cityName'] . ' ' .$countryName;
 		return json_encode([
 			'success' => true,
 			'content' => $dataFromPerson
@@ -601,11 +641,14 @@ class PersonController
     // used to gather professionals from the selected city
     public function fetchAllProfessionalOfThisCity($onlyThisRoles = [])
     {
-        $userCity = isset($_SESSION['userCity']) ? $_SESSION['userCity'] : null;
-        if(is_null($userCity))
+    	$cityName = isset($_POST['value']) ? $_POST['value'] : null;
+    	if(!$cityName){
+        	$cityName = isset($_SESSION['userCity']) ? $_SESSION['userCity'] : null;
+    	}
+        if(is_null($cityName))
             return null;
         $cityObj = new City();
-        $city = $cityObj->getCityByName($userCity);
+        $city = $cityObj->getCityByName($cityName);
         if(!$city)
             return null;
         $cityId = $city->getId();
@@ -622,17 +665,64 @@ class PersonController
         ]);
     }
 
+    // fetch by the state
     public function fetchAllProfessionalOfThisState($onlyThisRoles = [])
     {
-    	$userState = isset($_SESSION['userState']) ? $_SESSION['userState'] : null;
-    	$userState = 'parana';
-        if(is_null($userState))
+    	$stateName = isset($_POST['value']) ? $_POST['value'] : null;
+    	$doNotGoToLocation = false;
+    	if(!$stateName){
+        	$stateName = isset($_SESSION['userState']) ? $_SESSION['userState'] : null;
+        	$doNotGoToLocation = true;
+    	}
+        if(is_null($stateName))
             return null;
         $stateObj = new State();
-        $state = $stateObj->getStateByName($userState);
+        $state = $stateObj->getStateByName($stateName);
         if(!$state)
             return null;
         $stateId = $state->getId();
+        $personObj = new Person();
+        $people = $personObj->getByStateAndRole($stateId);
+    	$cityObj = new City();
+    	$cities = $cityObj->getCitiesByState($state->getId(), true);
+    	$newLocation = ($cities[1])->getCoordinates();
+    	$location = $cityObj->formateDegreeCoordinatesToMapCoordinates($newLocation);
+    	$arrayOfLocation = explode(' ', $location);
+    	$latitude  = $arrayOfLocation[0];
+    	$longitude = $arrayOfLocation[1];
+        if(is_null($people)){
+        	return json_encode([
+        		'success'        => true,
+        		'message'        => ucfirst(translate('no result')),
+        		'location'       => [$latitude,$longitude],
+        		'content'        => false,
+        		'followLocation' => true
+        	]);
+        }
+        $elementsArray = $personObj->parseAsEachRoleWithCoordinates($people, $onlyThisRoles);
+        return json_encode([
+        	'success' 		 => true,
+        	'message' 		 => ucfirst(translate('professionals fetched with success')),
+        	'content' 		 => $elementsArray,
+        	'location'		 => [$latitude,$longitude],
+        	'followLocation' => $doNotGoToLocation
+        ]);
+    }
+
+    // fetch by the country
+    public function fetchAllProfessionalOfThisCountry($onlyThisRoles = [])
+    {
+    	$countryName = isset($_POST['value']) ? $_POST['value'] : null;
+    	if(!$countryName){
+        	$countryName = isset($_SESSION['userCountry']) ? $_SESSION['userCountry'] : null;
+    	}
+        if(is_null($countryName))
+            return null;
+        $countryObj = new Country();
+        $country = $countryObj->getCountryByAlphaCode($countryName);
+        if(!$country)
+            return null;
+        $countryId = $country->getId();
         $personObj = new Person();
         $people = $personObj->getByStateAndRole($stateId);
         if(is_null($people)){
@@ -681,5 +771,96 @@ class PersonController
     		'message' => !$result ? ucfirst(translate('name is not in use')) : ucfirst(translate('name is in use')),
     		'isInUse' => $result ? true : false
     	]);
+    }
+
+    // update sent data
+    public function updateSomeData()
+    {
+    	$personId = isset($_SESSION['personId']) ? $_SESSION['personId'] : null;
+    	$data 	  = isset($_POST['dataToUpdate']) ? $_POST['dataToUpdate'] : null;
+    	if(!$personId || !$data || !is_array($data)){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('required data missing'))
+    		]);
+    	}
+    	$personObj = new Person();
+    	$person = $personObj->findById($personId);
+    	if(!$personId){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('log in'))
+    		]);
+    	}
+    	$hasNewValues = false;
+    	foreach($data as $attributeName => $value){
+    		if(!$value)
+    			continue;
+    		if($attributeName == 'fullName'){
+    			$name = explode(' ', $value);
+    			$lastPosition = count($name) - 1;
+    			$lastName = $name[$lastPosition];
+    			unset($name[$lastPosition]);
+    			$firstName = implode(' ', $name);
+    			$person->setName($firstName);
+    			$person->setLastName($lastName);
+    			$hasNewValues = true;
+    			continue;
+
+    		}
+    		$setMethod = 'set'.ucfirst($attributeName);
+    		try{
+    			$person->$setMethod($value);
+    		}catch(Exception $e){
+    			break;
+    		}
+    		$hasNewValues = true;
+    	}
+    	if(!$hasNewValues){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('no valid data sent'))
+    		]);
+    	}
+    	$result = $person->save();
+    	return json_encode([
+    		'success' => $result ? true : false,
+    		'message' => $result ? ucfirst(translate('updated with success')) : ucfirst(translate('was not updated')),
+    		'content' => $result ? $person->getFullData(false) : null
+    	]);
+    }
+
+    public function editByField()
+    {
+    	$personId = isset($_SESSION['personId']) ? $_SESSION['personId'] : null;
+    	$type     = isset($_POST['type']) ? $_POST['type'] : null;
+    	$value    = isset($_POST['value']) ? $_POST['value'] : null;
+    	if(!$personId || !$type || !$value){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('no valid data sent'))
+    		]);
+    	}
+    	$personObj = new Person();
+    	$person = $personObj->findById($personId);
+    	if(!$person){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('log in'))
+    		]);
+    	}
+    	$setMethod = 'set'.ucfirst($type);
+    	$person->$setMethod($value);
+    	$result = $person->save();
+    	if(!$person){
+    		return json_encode([
+    			'success' => false,
+    			'message' => ucfirst(translate('could no update'))
+    		]);
+    	}
+		return json_encode([
+			'success' => true,
+			'message' => ucfirst(translate('updated with success'))
+		]);
     }
 }

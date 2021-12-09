@@ -9,6 +9,7 @@
 	<!-- importing FontAwesome -->
 	<link href="Source/Resourses/External/fontawesome/css/all.css" rel="stylesheet"></link>
 	<link href="Source/Resourses/CSS/modal.css" rel="stylesheet"></link>
+	<link href="/<?= URL['urlDomain'] ?>/Source/Resourses/CSS/alert.css" rel="stylesheet"></link>
 </head>
 <header>
 	<nav id="top-navigation-bar">
@@ -168,6 +169,7 @@
 </body>
 </html>
 
+
 <div id="modal1" class="modal">
 	<div class="modal-data content-of-modal">
     	<div class="modal-header">
@@ -197,6 +199,15 @@
     </div>
 </div>
 
+<div id="loader-overlay">
+	<div id="loader"></div>
+</div>
+<div id="messager"></div>
+
+<?php include "Source/Resourses/Components/loader.php" ?>
+<?php include "Source/Resourses/Components/confirmation-alert.php" ?>
+<?php include "Source/Resourses/Components/messager-toast.php" ?>
+
 <script src="Source/Resourses/JS-functions/modal.js"></script>
 <script type="text/javascript">
 	var accountData = {};
@@ -216,7 +227,8 @@
 
 	// search for cep and complete data accordingly to return
 	$('#search-for-cep').on('click', function(){
-		alert('put a loader here');
+		var scrollPosition = $(document).scrollTop();
+		openLoader();
 		var cep = $('#cep').val();
 		$.ajax({
 			url: 'trytofindcep',
@@ -226,14 +238,13 @@
 			success: function(data){
 				if(data.content != null){
 					$('.need-cep-to-be-informed').show();
-					alert('found something');
 					fillFieldsWithCEPData(data.content);
-					return;
+				}else{
+					openToast("<?php echo ucfirst(translate('please enter a valid CEP')); ?>");
 				}
-				alert('please enter a valid CEP');
 			},
 			complete: function(){
-				alert('the loader end');
+				openLoader(false, scrollPosition);
 			}
 		});
 	});
@@ -245,7 +256,7 @@
 	var stateISO = null;
 	function fillFieldsWithCEPData(data = null){
 		if(data == null || data.length < 1){
-			alert('an error occured');
+			openToast("<?php echo ucfirst(translate('an error occured')); ?>");
 			return;
 		}
 		city 		 = data['cityName'];
@@ -269,7 +280,6 @@
 			},
 			complete: function(){
 				if(dataFound == null){
-
 					return;
 				}
 				$('.countryID-'+dataFound.data.id).attr('selected','selected');
@@ -321,7 +331,7 @@
 	function handleViewsByType(typeOfUser){
 		switch(typeOfUser){
 			case 'serviceSuplier':
-				alert('please, select your type of service suplier');
+				openToast("<?php echo ucfirst(translate('please, select your type of service suplier')); ?>");
 				$('.role-img-handle').hide();
 				openModal();
 			break;
@@ -345,7 +355,7 @@
 	$('.next-button-section-one').on('click', function(){
 		var selectedElement = $('.last-selection');
 		if(selectedElement.length == 0){
-			alert('oh no, you must inform something');
+			openToast("<?php echo ucfirst(translate('please, select a role to proceed')); ?>");
 			return;
 		}
 		var type = selectedElement.attr('data-role');
@@ -369,6 +379,9 @@
 		if(currentSection == 'section2'){
 			$('.second-section').remove();
 		}
+		if(currentSection == 'section3'){
+			$('.third-section').remove();
+		}
 	}
 	// brings section two
 	function insertSection(sectionName){
@@ -381,11 +394,14 @@
 		if(sectionName == 'section3'){
 			$('.third-section').show();
 		}
+		if(sectionName == 'section4'){
+			$('.fourth-section').show();
+		}
 		$(document).scrollTop(0);
 	}
 	$('#personal-data').on('click', function(){
 		if($(this).hasClass('selected-on-menu') == false){
-			alert('you can not');
+			openToast("<?php echo ucfirst(translate('not allowed')); ?>");
 			return;
 		}
 		removeFormerSection('personal-data');
@@ -402,7 +418,7 @@
 		countryId = $(this).find(":selected").attr('data-countryId');
 		countryName = $(this).val();
 		if(countryName == 'no option'){
-			alert('choose something');
+			openToast("<?php echo ucfirst(translate('please, choose a country')); ?>");
 			$('#states').hide();
 			return;
 		}
@@ -438,7 +454,7 @@
 		stateId = $(this).find(":selected").attr('data-stateId');
 		stateName = $(this).val();
 		if(stateName == 'no option'){
-			alert('choose something');
+			openToast("<?php echo ucfirst(translate('please, choose a state')); ?>");
 			$('#cities').hide();
 			return;
 		}
@@ -526,7 +542,7 @@
 
 		if(hasNeededFields == false){
 			$(document).scrollTop(0);
-			alert('please, enter the required fields');
+			openToast("<?php echo ucfirst(translate('please, enter the required fields')); ?>");
 			return;
 		}
 
@@ -536,7 +552,14 @@
 				if(name.length < 5){
 					$(document).scrollTop($('.fullName'));
 					$('.fullName').focus();
-					alert('name is too short, minimum length is five');
+					openToast("<?php echo ucfirst(translate('name is too short, minimum length is five')); ?>");
+					return;
+				}
+				var nameArray = name.split(' ');
+				if(nameArray.length < 2){
+					$(document).scrollTop($('.fullName'));
+					$('.fullName').focus();
+					openToast("<?php echo ucfirst(translate('enter your full name')); ?>");
 					return;
 				}
 				accountData['fullName'] = name;
@@ -570,7 +593,7 @@
 			success: function(response){
 				if(response.success == true){
 					if(response.isInUse == true){
-						alert('name is already in use, please try another one');
+						openToast("<?php echo ucfirst(translate('name is already in use, please try another one')); ?>");
 						$(document).scrollTop('.fullName');
 						return;
 					}
@@ -585,6 +608,7 @@
 	});
 
 	// section 3
+	var accountWasCreated = false;
 	$('.next-button-section-three').on('click', function(){
 		var hasNeededFields = true;
 		var required = $('.third-section').find('.required');
@@ -597,34 +621,68 @@
 		});
 		if(hasNeededFields == false){
 			$(document).scrollTop(0);
-			alert('please, enter the required fields');
+			openToast("<?php echo ucfirst(translate('please, enter the required fields')); ?>");
 			return;
 		}
 
 		var password = $('.password').val();
 		if(password != $('.repeatPassword').val()){
-			alert('password does no match');
+			openToast("<?php echo ucfirst(translate('password does no match')); ?>");
 			return;
 		}
 
 		accountData['email']     = $('.email').val();
 		accountData['password']  = $('.password').val();
-
+		openLoader();
 		$.ajax({
 			url: 'person/save',
 			type: 'POST',
 			data: {accountData: accountData},
 			dataType: 'JSON',
 			success: function(response){
+				$('.cancelbutton').hide();
 				if(response.success == true){
 					// open the confirmation informing an email will be sent
+					removeFormerSection('section3');
+					setTitleAndMessage("<?php echo ucfirst(translate('account created with success')); ?>", "<?php echo ucfirst(translate('you will receive a confirmation link in your email in order to verify your account')); ?>");
+					setButtonsMessage('', "<?php echo ucfirst(translate('continue')); ?>");
+					accountWasCreated = true;
 				}else{
-					alert(response.message);
-					return;
+					setTitleAndMessage("<?php echo ucfirst(translate('account could not be created')); ?>", response.message);
+					setButtonsMessage('', "<?php echo ucfirst(translate('continue')); ?>");
 				}
+			},
+			complete: function(){
+				openLoader(false);
+				openConfirmationAlert();
 			}
 		});
 	});
+
+	$('.confirmbutton').on('click', function(){
+		if(accountWasCreated == true){
+			$('.confirmbutton').off('click');
+			goToLoginPage();
+		}
+	});
+	$('.confirmbutton').off('click');
+	$('.confirmation-close').on('click', function(){
+		if(accountWasCreated == true){
+			$('.confirmbutton').off('click');
+			goToLoginPage();
+		}
+	});
+	$('.confirmbutton').off('click');
+	$('.confirmbutton').on('click', function(){
+		if(accountWasCreated == true){
+			$('.confirmbutton').off('click');
+			goToLoginPage();
+		}
+	});
+
+	function goToLoginPage(){
+		location.href = '/<?= URL['urlDomain'] ?>/login';
+	}
 	
 	function capitalize(text) {
 	    return text.charAt(0).toUpperCase() + text.slice(1);

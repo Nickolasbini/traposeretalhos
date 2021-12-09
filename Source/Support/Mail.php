@@ -62,10 +62,10 @@ class Mail
 		}
 
 		// Title of email
-		$this->mail->subject = $subject;
-		
+		$this->mail->Subject = $subject;
+
 		foreach($embeddedImgs as $imgName => $path){
-			$this->mail->AddEmbeddedImage( $path, $imgName );
+			$this->mail->AddEmbeddedImage($path, $imgName);
 		}
 
 		$this->mail->msgHTML($message);
@@ -76,7 +76,7 @@ class Mail
 		// Adding attachments
 		if(!empty($attachments)){
 			foreach($attachments as $attachmentName => $pathName){
-				$this->mail->addAttachment($pathName, $attachmentName);
+				$this->mail->AddAttachment($pathName);
 			}
 		}
 

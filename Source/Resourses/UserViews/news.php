@@ -18,7 +18,7 @@
 			<div class="section-vertical-wrapper post-person-data">
 				<span class="post-owner-name"><?= $post['name'] ?></span>
 				<span class="post-owner-address"><?= $post['city&State'] ?></span>
-				<span class="post-owner-classification"><?= $post['roleData']['personScoreStars'] ?></span>			
+				<span class="post-owner-classification rate-star"><img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/rate-star.svg"></span>			
 			</div>
 			<div class="section-vertical-wrapper post-options">
 				<div class="post-card-top-options">
@@ -32,7 +32,7 @@
 			</div>
 		</div>
 		<div class="post-content">
-			<img src="<?= $post['profilePhoto'] ?>">
+			<img src="<?= $post['postPhotos'][0] ?>">
 			<div class="content-of-post">
 				<h3 class="title-of-post-card">
 					<?php echo $post['postTitle']; ?>
@@ -56,8 +56,8 @@
 					$personId = isset($_SESSION['personId']) ? $_SESSION['personId'] : null;
 					if(!is_null($personId) && $post['id'] == $personId){
 				?>
-				<img class="edit-post" src="Source/Resourses/External/icons/edit.svg" title="<?php echo ucfirst(translate('edit')) ?>">
-				<img class="remove-post" src="Source/Resourses/External/icons/remove.svg" title="<?php echo ucfirst(translate('remove')) ?>">
+				<img class="edit-post" src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/edit.svg" title="<?php echo ucfirst(translate('edit')) ?>">
+				<img class="remove-post" src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/remove.svg" title="<?php echo ucfirst(translate('remove')) ?>">
 				<?php } ?>
 			</div>
 		</div>
@@ -98,19 +98,19 @@
 <?php include "Source/Resourses/Components/edit-post-modal.php" ?>
 <script src="Source/Resourses/JS-functions/modal.js"></script>
 <script type="text/javascript">
-	var a = $('.post-content img');
-	var path = 'http://localhost/traposeretalhos/Source/Files/img/';
-	var names = ['pants.jpg', 'shirt.jpg'];
-	i = 0;
-	a.each(function(){
-		$(this).attr('src', path+names[i]);
-		i++;
-	});
 
 	// open the AddComments modal in order to add a new comment 
-	 var postId = null;
-	 var postElement = null;
+	var sessionPersonId = "<?php echo isset($_SESSION['personId']) ? $_SESSION['personId'] : null; ?>";
+	var postId = null;
+	var postElement = null;
 	$('.add-comments').off('click').click(function(){
+		if(sessionPersonId == ''){
+			setIds('do-not-login', 'perform-login');
+			setTitleAndMessage("<?php echo ucfirst(translate('please login first')); ?>", "<?php echo ucfirst(translate('you need to login to be able to send a comment')); ?>");
+			setButtonsMessage("<?php echo ucfirst(translate('cancel')); ?>", "<?php echo ucfirst(translate('login')); ?>");
+			openConfirmationAlert();
+			return;
+		}
 		$('.content-wrapper').addClass('center-text');
 		postElement = $(this).parents('.post-card');
 		postId = $(this).parents('.post-card').attr('data-post-id');
@@ -121,9 +121,18 @@
 		$('.content-wrapper').html(html);
 		openModal();
 	});
+	$(document).off('click', '#perform-login');
+	$(document).on('click', '#perform-login', function(){
+		window.location.href = '/<?= URL['urlDomain'] ?>/login';
+	});
 	$(document).off("click", "#save-new-comment");
 	$(document).on("click","#save-new-comment",function(){
 		var commentText = $('#new-comment-text').val();
+		if(!isValidText(commentText)){
+			openToast("<?php echo ucfirst(translate('please, enter a valid value')); ?>");
+			return;
+		}
+		openLoader();
 		$.ajax({
 			url: 'comment/save',
 			type: 'POST',
@@ -133,15 +142,18 @@
 				result = JSON.parse(data);
 		    	if(result['success'] == true){
 		    		closeModal();
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    		updateNumberOfThisComment(postId);
 		    	}else{
 		    		if(result['performLogin'] == true){
 		    			window.location = "<?= '/'.URL['urlDomain']?>/login";
 		    		}else{
-			    		alert(result['message']);
+			    		openToast(result['message']);
 		    		}
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 		closeModal();
@@ -215,6 +227,7 @@
 		gatherCommentsData(postIdOfComment);
 	});
 	function removeComment(commentId, postId){
+		openLoader();
 		$.ajax({
 			url: 'comment/remove',
 			type: 'POST',
@@ -224,10 +237,13 @@
 		    	if(result['success'] == true){
 		    		gatherCommentsData(postId);
 		    		updateNumberOfThisComment(postId);
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}else{
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 	}
@@ -250,6 +266,7 @@
 	});
     // responsible by requesting the comments data related to this Post
 	function gatherCommentsData(postId = null){
+		openLoader();
 		$('.content-wrapper').attr('data-postId', postId);
 		$('.modal-title').html("<?php echo ucfirst(translate('post comments')) ?>");
 		$.ajax({
@@ -261,9 +278,12 @@
 		    	if(result['success'] == true){
 		    		feedCommentsModal(result['content']);
 		    	}else{
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}
 			},
+			complete: function(){
+				openLoader(false);
+			}
 		});
 	}
 	// make the ajax request for the click on the post 'seeComment' button
@@ -359,6 +379,7 @@
 
 	// update like number
 	function manageCommentsLike(commentId, addNew, element){
+		openLoader();
 		$.ajax({
 			url: 'comment/managelikes',
 			type: 'POST',
@@ -369,15 +390,15 @@
 					window.location = "<?= '/'.URL['urlDomain']?>/login";
 					return;
 				}
-				alert(result.message);
 				var numberOfLikes = result.likesNumber;
 				if(numberOfLikes == 0){
 					numberOfLikes = '';
 				}
 				element.find('.total-of-likes').html(numberOfLikes);
-				alert(result.likesNumber);
-				alert('loader ended');
 			},
+			complete: function(){
+				openLoader(false);
+			}
 		});
 	}
 
@@ -404,6 +425,7 @@
 		openConfirmationAlert();
 	});
 	function removePost(postId){
+		openLoader();
 		$.ajax({
 			url: 'post/remove',
 			type: 'POST',
@@ -412,26 +434,31 @@
 			success: function(result){
 		    	if(result['success'] == true){
 		    		postElement.remove();
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}else{
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 	}
 
 	function getPostData(postId){
+		openLoader();
 		$.ajax({
 			url: 'post/getdata',
 			type: 'POST',
 			data: {id: postId},
 			dataType: 'JSON',
 			success: function(result){
-		    	if(result['success'] == true){
-		    		alert(result['message']);
-		    	}else{
-		    		alert(result['message']);
+		    	if(result['success'] == false){
+		    		openToast(result['message']);
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 	}
@@ -525,9 +552,11 @@
 	}
 	.profile-photo-wrapper>img{
 		width: 100%;
-		border-radius: 50%;
+		border-radius: 100%;
 		margin-top: auto;
 		margin-bottom: auto;
+		width: 100px;
+		height: 100px;
 	}
 	.post-options{
 		margin-left: auto;
@@ -731,6 +760,78 @@
 	@media only screen and (max-width: 600px) {
 	    .post-card{
 	    	width: 90%!important;
+	    }
+	    .post-card-first-level{
+	    	flex-direction: column;
+	    }
+	    .profile-photo-wrapper{
+	    	text-align: center;
+			width: 100%;
+	    }
+	    .profile-photo-wrapper > img{
+	    	width: 100px;
+	    	height: 100px;
+	    }
+	    .section-vertical-wrapper{
+	    	width: 100%;
+			text-align: center;
+			width: 50%;
+			margin: auto;;
+	    }
+	    .post-title-wrapper{
+	    	font-size: 0.8em;
+			padding: 5px;
+	    }
+	    .comments-button{
+	    	padding: 6px;
+			font-size: 0.8em;
+	    }
+	    .content-of-post{
+	    	width: 80%;
+			margin: auto;
+	    }
+	    .post-content{
+	    	flex-direction: column;
+	    	padding-top: 5%;
+	    }
+	    .post-content > img{
+	    	width: 95%;
+			height: 200px;
+			margin: auto;
+	    }
+	    .comments-of-people{
+	    	flex-direction: column;
+			margin: auto;
+			text-align: center;
+			padding-top: 15%;
+			margin-bottom: 15%;
+			border-top: 1px solid gray;
+	    }
+	    .comment-profile-img-wrapper{
+	    	width: 50%;
+			margin: auto;
+	    }
+	    .comment-profile-img-wrapper > img{
+	    	width: 100px;
+			height: 100px;
+	    }
+	    .comment-section{
+	    	width: 90%;
+	    }
+	    .comment-dates{
+	    	margin-top: 10%;
+	    	text-align: center;
+	    }
+	    .comment-text-wrapper{
+	    	text-indent: 5px;
+			text-align: left;
+	    	height: 50px;
+	    }
+	    .comment-options{
+	    	margin-top: 5%;
+	    }
+	    .comments-button{
+	    	padding: 6px !important;
 	    }
 	}
 	@media only screen and (max-width: 1400px) {

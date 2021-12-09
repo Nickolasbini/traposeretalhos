@@ -1,5 +1,8 @@
 <?php
 
+const PRODUCTION   = false;
+const ALL_FEATURES = false;
+
 define("DATA_LAYER_CONFIG", [
     "driver" => "mysql",
     "host" => "localhost",
@@ -15,14 +18,34 @@ define("DATA_LAYER_CONFIG", [
     ]
 ]);
 
-define("MAIL_CONFIGURATION", [
-    "host"=>"smtp.gmail.com",
-    "port"=>"587",
-    "user"=>"nciwebsolution@gmail.com",
-    "passwd"=>"vin@!gard",
-    "fromName"=>"NCI_WebSolutions",
-    "fromMail"=>"nciwebolution@gmail.com",
-    "AltBody"=>"Nci webSolutions"
+if(!PRODUCTION){
+    define("MAIL_CONFIGURATION", [
+        "host"=>"smtp.gmail.com",
+        "port"=>"587",
+        "user"=>"nciwebsolution@gmail.com",
+        "passwd"=>"vin@!gard",
+        "fromName"=>"NCI_WebSolutions",
+        "fromMail"=>"nciwebolution@gmail.com",
+        "AltBody"=>"Nci webSolutions"
+    ]);
+}else{
+    define("MAIL_CONFIGURATION", [
+        "host"=>"mail.traposeretalhos.com",
+        "port"=>"587",
+        "user"=>"traposeretalhos@traposeretalhos.com",
+        "passwd"=>"R6H1kl7yo4",
+        "fromName"=>"Trapos e Retalhos",
+        "fromMail"=>"traposeretalhos@traposeretalhos.com",
+        "AltBody"=>"Trapos e Retalhos"
+    ]);
+}
+
+define("CONTACTS", [
+    'whatsapp-number' => '5541984320432',
+    'whatsapp-text'   => 'be welcome to Trapos e Retalhos administration whatsApp number. Please, what do we own the pleasure of your contact?',
+    'facebook-page'   => 'https://www.facebook.com/Trapos-e-retalhos-administrativo-102146478640012',
+    'instagram-page'  => 'https://www.instagram.com/traposeretalhosoficial/',
+    'email-link'      => 'traposeretalhos@traposeretalhos.com'
 ]);
 
 define("TEMPLATES_PATH", [
@@ -31,6 +54,7 @@ define("TEMPLATES_PATH", [
 ]);
 
 define("URL",[
+    'realPath'  => !PRODUCTION ? 'localhost/traposeretalhos' : 'traposeretalhos.com',
     'urlDomain' => getBaseURLPath(),
     'webPath'   => getBaseWebPath(),
     'iconsPath' => 'Source/Resourses/External/icons/'

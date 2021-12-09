@@ -49,6 +49,11 @@
 	$(document).off("click", "#save-editted-comment");
 	$(document).on("click","#save-editted-comment",function(){
 		var edditedComment = $('.edit-comment').val();
+		if(edditedComment.length == 0 || !edditedComment.replace(/\s/g, '').length){
+			openToast("<?php echo ucfirst(translate('please, enter a valid value')); ?>");
+			return;
+		}
+		openLoader();
 		$.ajax({
 			url: 'comment/save',
 			type: 'POST',
@@ -59,11 +64,12 @@
 		    	if(result['success'] == true){
 		    		closeModal('modal2');
 		    		openModal();
-		    		alert(result['message']);
+		    		openToast(result['message']);
 		    		gatherCommentsData(idOfPost);
-		    	}else{
-		    		alert(result['message']);
 		    	}
+			},
+			complete: function(){
+				openLoader(false);
 			}
 		});
 	});

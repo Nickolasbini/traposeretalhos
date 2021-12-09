@@ -92,7 +92,15 @@ class PersonalPage extends DataLayer
 		$this->setpageURL(PersonalPage::BASE_URL.base64_encode($personRoleId));
 		$this->setIsTemplate(false);
 		$this->setTemplatePersonalPage(1);
+		$this->setBackgroundPhoto($this->fetchDefaultPhotoElement());
 		$result = $this->save();
 		return !is_null($result) ? $this->data->id : null;
+	}
+
+	public function fetchDefaultPhotoElement()
+	{
+		$documentObj = new Document();
+		$documentId = $documentObj->fetchDefaultPhotoElement();
+		return $documentId;
 	}
 }

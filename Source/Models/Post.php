@@ -92,7 +92,7 @@ class Post extends DataLayer
 		return $this->person;
 	}
 
-	public function list($total = null, $limit = null, $offset = null)
+	public function list($total = null, $limit = null, $offset = null, $category = null)
 	{
 		if(!is_null($total)){
 			$total = $this->find()->count();
@@ -101,7 +101,7 @@ class Post extends DataLayer
 		$posts = $this->find()->limit($limit)->offset($offset)->order('dateOfCreation or dateOfUpdate')->fetch(true);
 		return $posts;
 	}
-	public function getFullData()
+	public function getFullData($photos = null)
 	{
 		$response = [
 			'id' => $this->getId(),

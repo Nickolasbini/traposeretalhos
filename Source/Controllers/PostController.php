@@ -53,9 +53,9 @@ class PostController
           }
           // check if file has photos
           $hasPhotos = false;
-          if(array_key_exists('photos', $parameters)){
-               $hasPhotos = $parameters['photos'];
-               unset($parameters['photos']);
+          if(array_key_exists('postPhoto', $parameters)){
+               $hasPhotos = $parameters['postPhoto'];
+               unset($parameters['postPhoto']);
           }
           // set data
           foreach($parameters as $key => $value){
@@ -85,6 +85,7 @@ class PostController
                }
                $postObj->{$setMethod}($value);
           }
+          $fullData = $postObj->getFullData();
           $result = $postObj->save();
           if(!$result){
                return json_encode([
@@ -98,14 +99,15 @@ class PostController
           // now create the photos and link it
           if($hasPhotos){
                $postPhotoObj = new PostPhoto();
-               $result = $postPhotoObj->savePostPhoto($postId);
+               $result = $postPhotoObj->savePostPhoto($postId, $hasPhotos);
                if(!$result)
                     $message = $message.' - '.ucfirst(translate('your photo(s) have not been created'));
           }
           return json_encode([
                'success' => true,
                'message' => $message,
-               'id'      => $postId 
+               'id'      => $postId,
+               'post'    => $fullData
           ]);
      }
 
@@ -191,7 +193,7 @@ class PostController
           $posts = $postObj->list(null, $paginator->limit(), $paginator->offset());
           $response = [];
           $message = null;
-          if(count($posts) > 1){
+          if($posts && count($posts) > 0){
                foreach($posts as $post){
                     $personObj = $post->getPerson(true);
                     $personData = $personObj->getFullData();
@@ -214,7 +216,6 @@ class PostController
           }else{
                $message = ucfirst(translate('no post'));
           }
-
           return json_encode([
                'success' => true,
                'content' => $response,

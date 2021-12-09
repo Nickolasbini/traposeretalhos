@@ -33,7 +33,8 @@ $app->get('/person/personalpage/identification:id', function($id){
 	$templatePersonalPage = $personalPage->getTemplatePersonalPage();
 	if(!is_null($templatePersonalPage)){
 		echo $userTemplate->render('PersonalPages/templatePersonalPage'.$templatePersonalPage, [
-			'person'	 => $personFullData
+			'person' 		 => $personFullData,
+			'personalPageId' => $id 
 		]);
 		exit;
 	}
@@ -71,11 +72,12 @@ $app->post('/login', function(){
 	$email    = isset($_POST['email']) ? $_POST['email'] : null;
 	$password = isset($_POST['password']) ? $_POST['password'] : null;
 	$personCt = new PersonController();
-	$result = $personCt->login($email, $password);
-	$result = json_decode($result, true);
+	$resultJSON = $personCt->login($email, $password);
+	$result = json_decode($resultJSON, true);
 	if(!$result['success']){
-		$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
-		echo $userTemplate->render('login-area');
+		$_SESSION['messageToDisplay'] = $result['message'];
+		echo $resultJSON;
+		exit();
 	}
 	$_SESSION['viewMessage'] = ucfirst(translate('be welcome'));
 	if(isset($_SESSION['history']) && !empty(json_decode($_SESSION['history'], true)[1])){
@@ -83,7 +85,8 @@ $app->post('/login', function(){
 	}else{
 		$routeToGo = '/'.URL['urlDomain'];
 	}
-	header('Location: '.$routeToGo);
+	$_SESSION['messageToDisplay'] = $result['message'];
+	echo $resultJSON;
 	exit;
 });
 
@@ -94,6 +97,9 @@ $app->get('/accountconfirmation/:data', function($data){
 	$personId = $dataArray[2];
 	$personCt = new PersonController();
 	$result = $personCt->verifyAccountEmail($email, $code, $personId);
+	$resultArray = json_decode($result, true);
+	$_SESSION['messageToDisplay'] = $resultArray['message'];
+	header('Location: /'.URL['urlDomain']);
 	exit($result);
 });
 
@@ -122,14 +128,14 @@ $app->get('/person/remove', function(){
 // View with my account data
 $app->get('/myaccount', function(){
 	if(!FunctionsClass::isPersonLoggedIn()){
-		$_SESSION['messages'] = ucfirst(translate('please, log in first'));
+		$_SESSION['messageToDisplay'] = ucfirst(translate('please, log in first'));
 		header('Location: /'.URL['urlDomain'].'/login');
 		exit;
 	}
 	$personCt = new PersonController();
 	$data = json_decode($personCt->retrieveUserAccount(), true);
 	if(!$data['success']){
-		$_SESSION['messages'] = ucfirst(translate('please, log in first'));
+		$_SESSION['messageToDisplay'] = ucfirst(translate('please, log in first'));
 		header('Location: '.URL['urlDomain'].'/login');
 		exit;	
 	}
@@ -187,9 +193,24 @@ $app->post('/city/gathercitybyname', function(){
 // getting cities of state
 $app->post('/person/fetchprofessionalsformap', function(){
 	$onlyThisRoles = isset($_POST['onlyThisRoles']) ? $_POST['onlyThisRoles'] : [];
+	$filterBy 	  = isset($_POST['filterBy']) ? $_POST['filterBy'] : null;
+	$valueOfFilter = isset($_POST['valueOfFilter']) ? $_POST['valueOfFilter'] : null;
 	$personCt = new PersonController();
-	$professionals = $personCt->fetchAllProfessionalOfThisState($onlyThisRoles);
-	//$professionals = $personCt->fetchAllProfessionalOfThisCity($onlyThisRoles);
+	switch($filterBy){
+		case 'city':
+			$professionals = $personCt->fetchAllProfessionalOfThisCity($onlyThisRoles);
+		break;
+		case 'state':
+			$professionals = $personCt->fetchAllProfessionalOfThisState($onlyThisRoles);
+		break;
+
+		case 'country':
+			$professionals = $personCt->fetchAllProfessionalOfThisCity($onlyThisRoles);
+		break;	
+		default:
+			$professionals = $personCt->fetchAllProfessionalOfThisState($onlyThisRoles);
+		break;
+	}
 	echo $professionals;
 	return $professionals;
 });
@@ -203,24 +224,18 @@ $app->post('/personalpage/getmyworks', function(){
 	return $myWorks;
 });
 
-// messages routes
-$app->post('/message/listmessages', function(){
-	$messageCt = new MessageController();
-	$myWorks = $messageCt->listMessages();
+// save a personal page work
+$app->post('/personalpage/addwork', function(){
+	$personalPageCt = new PersonalPageController();
+	$myWorks = $personalPageCt->addWork();
 	echo $myWorks;
 	return $myWorks;
 });
 
-$app->post('/message/save', function(){
-	$messageCt = new MessageController();
-	$myWorks = $messageCt->save();
-	echo $myWorks;
-	return $myWorks;
-});
-
-$app->post('/message/sendmessage', function(){
-	$messageCt = new MessageController();
-	$myWorks = $messageCt->sendMessage();
+// remove a personal page work
+$app->post('/personalpage/removework', function(){
+	$personalPageCt = new PersonalPageController();
+	$myWorks = $personalPageCt->removeWork();
 	echo $myWorks;
 	return $myWorks;
 });
@@ -228,6 +243,20 @@ $app->post('/message/sendmessage', function(){
 $app->post('/person/verifyname', function(){
 	$personCt = new PersonController();
 	$response = $personCt->verifyUsageOfName();
+	echo $response;
+	return $response;
+});
+
+$app->post('/person/updatesomedata', function(){
+	$personCt = new PersonController();
+	$response = $personCt->updateSomeData();
+	echo $response;
+	return $response;
+});
+
+$app->post('/person/editbyfield', function(){
+	$personCt = new PersonController();
+	$response = $personCt->editByField();
 	echo $response;
 	return $response;
 });

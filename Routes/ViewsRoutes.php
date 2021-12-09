@@ -1,6 +1,7 @@
 <?php
 use Source\Controllers\CountryController;
 use Source\Controllers\PersonController;
+use Source\Controllers\FavoriteController;
 
 $app->get('/map', function(){
 	$roles = file_get_contents('Source/Files/roles.txt');
@@ -19,6 +20,19 @@ $app->get('/tips', function(){
 $app->get('/courses', function(){
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
 	echo $userTemplate->render('courses', ['title' => ucfirst(translate('our courses'))]);
+});
+
+$app->get('/favorites', function(){
+	$favoriteCt = new FavoriteController();
+	$_POST['favoriteCategory'] = '1';
+	$results = $favoriteCt->list();
+	$results = json_decode($results, true);
+	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
+	echo $userTemplate->render('favorites', [
+		'title' => ucfirst(translate('favorites')),
+		'favorites' => $results['content'],
+		'pagination' => $results['page']
+	]);
 });
 
 $app->get('/newaccount', function(){

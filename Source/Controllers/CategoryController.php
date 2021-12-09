@@ -61,4 +61,24 @@ class CategoryController
                'id'      => $categoryObj->data->id
           ]);
      }
+
+     public function getAll($onlyCategories = null)
+     {
+          $categoryObj = new Category;
+          $categories = $categoryObj->find()->fetch(true);
+          $elements = [];
+          foreach($categories as $category){
+               $element = $category->getFullData();
+               $userLanguage = strtolower($_SESSION['userLanguage']);
+               $element['categoryTranslation'] = $element['translation'][$userLanguage];
+               $elements[] = $element;
+          }
+          if($onlyCategories){
+               return $elements;
+          }
+          return json_encode([
+               'success' => true,
+               'content' => $categories
+          ]);
+     }
 }

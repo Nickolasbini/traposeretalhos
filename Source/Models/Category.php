@@ -80,4 +80,15 @@ class Category extends DataLayer
 		$translatedTerm = $translationObj->{$getMethod}();
 		return $translatedTerm;
 	}
+
+	public function getFullData()
+	{
+		$elements = [
+			'id' 		   => $this->getId(),
+			'categoryName' => $this->getCategoryName(),
+			'categoryType' => $this->getCategoryType(),
+			'translation'  => $this->getTranslation(true)->getFullData()
+		];
+		return $elements;
+	}
 }

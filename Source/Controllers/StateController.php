@@ -76,4 +76,31 @@ class StateController{
         	'countryTranslation' => $translatedName
         ]);
     }
+
+    public function search()
+    {
+        $criteria = isset($_POST['criteria']) ? $_POST['criteria'] : null;
+        $value    = isset($_POST['value'])    ? $_POST['value']    : null;
+        if(!$criteria || !$value){
+            return json_encode([
+                'success' => false,
+                'message' => ucfirst(translate('required parameters missing'))
+            ]);
+        }
+        $stateObj = new State();
+        $states = $stateObj->search($criteria, $value);
+        $elements = [];
+        if($states){
+            $states = !is_array($states) ? [$states] : $states;
+            foreach($states as $state){
+                $elements[] = $state->getFullData();
+            }
+        }
+        return json_encode([
+            'success'          => true,
+            'message'          => ucfirst(translate('finished search')),
+            'content'          => $elements,
+            'numberOfElements' => count($elements)
+        ]);
+    }
 }

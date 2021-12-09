@@ -154,9 +154,13 @@ class City extends DataLayer
 		return $cities;
 	}
 
-	public function getCitiesByState($stateId = null)
+	public function getCitiesByState($stateId = null, $withLocation = null)
 	{
-		$citiesObj = $this->find("state = :stateId", "stateId=$stateId")->fetch(true);
+		if($withLocation){
+			$citiesObj = $this->find("state = :stateId AND coordinates is not null", "stateId=$stateId")->fetch(true);
+		}else{
+			$citiesObj = $this->find("state = :stateId", "stateId=$stateId")->fetch(true);
+		}
 		return $citiesObj;
 	}
 }

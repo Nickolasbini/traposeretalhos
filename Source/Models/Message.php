@@ -119,6 +119,16 @@ class Message extends DataLayer
         return $this->messageFile;
     }
 
+    public function setHasSeen($HasSeen)
+    {
+        $this->HasSeen = $HasSeen;
+    }
+
+    public function getHasSeen()
+    {
+        return $this->hasSeen;
+    }
+
     /*
         creates Document obj and link it
         try to return the id
@@ -143,7 +153,18 @@ class Message extends DataLayer
         if($total){
             $messageObj = $this->find("ownerOfMessage = :personId or targetPerson = :personId", "personId=$personId")->count();
         }else{
-            $messageObj = $this->find("ownerOfMessage = :personId or targetPerson = :personId", "personId=$personId")->limit($limit)->offset($offset)->fetch(true);
+            $messageObj = $this->find("ownerOfMessage = :personId or targetPerson = :personId", "personId=$personId")->order('dateOfMessage ASC')->limit($limit)->offset($offset)->fetch(true);
+        }
+        return $messageObj;
+    }
+
+    public function getAllMessagesOfPerson($personId, $total = null, $limit = null, $offset = null)
+    {
+        // addapt to be paginated
+        if($total){
+            $messageObj = $this->find("targetPerson = :personId", "personId=$personId")->count();
+        }else{
+            $messageObj = $this->find("targetPerson = :personId", "personId=$personId")->order('dateOfMessage ASC')->limit($limit)->offset($offset)->fetch(true);
         }
         return $messageObj;
     }
@@ -172,5 +193,51 @@ class Message extends DataLayer
             // order by dateOfMessage ASC
         }
         return $messageObj;
+    }
+
+    public function getMessagesByFather()
+    {
+        $personId = isset($_SESSION['personId']) ? $_SESSION['personId'] : null;
+        if(!$personId){
+            return null;
+        }
+        $messageObj = $this->find("ownerOfMessage = :ownerOfMessageId and fatherMessage is null","ownerOfMessageId=$personId")->order("dateOfMessage DESC")->fetch(true);
+        return $messageObj ? $messageObj[0] : null;
+    }
+
+    public function getChildren($orderBy = 'ASC'){
+        $fatherMessageId = $this->getId();
+        $messageObj = $this->find("fatherMessage = :fatherMessageId","fatherMessageId=$fatherMessageId")->order("dateOfMessage $orderBy")->fetch(true);
+        return $messageObj ? $messageObj : null;
+    }
+
+    public function getLastChild(){
+        $fatherMessageId = $this->getId();
+        $messageObj = $this->find("fatherMessage = :fatherMessageId","fatherMessageId=$fatherMessageId")->order("dateOfMessage DESC")->limit(1)->fetch(true);
+        return $messageObj ? $messageObj[0] : null;
+    }
+
+    public function getFullData($gatherObjects = true)
+    {
+        $element = [
+            'id'             => $this->getId(),
+            'ownerOfMessage' => $this->getOwnerOfMessage($gatherObjects),
+            'targetPerson'   => $this->getTargetPerson($gatherObjects),
+            'firstMessage'   => $this->getFirstMessage(),
+            'fatherMessage'  => $this->getFatherMessage(),
+            'messageText'    => $this->getMessageText(),
+            'messageFile'    => $this->getMessageFile(),
+            'dateOfMessage'  => $this->getDateOfMessage($gatherObjects),
+            'hasSeen'        => $this->getHasSeen()
+        ];
+        return $element;
+    }
+
+    public function locateFatherMessageByPersonIds($personId, $personToLocate)
+    {
+        $messageObj = $this->find(
+            "((ownerOfMessage = :personId and targetPerson = :personToLocate) or (ownerOfMessage = :personToLocate and targetPerson = :personId)) and fatherMessage is null","personId=$personId&personToLocate=$personToLocate"
+        )->fetch(true);
+        return $messageObj ? $messageObj[0] : null;
     }
 }

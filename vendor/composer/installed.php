@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '520a2c20da7f6ea212b3ee451b62a81884015312',
+        'reference' => 'dd4ba98f660f176b2086261a82a8f1d1a6dd2b13',
         'name' => 'nickolas/traposeretalhos',
         'dev' => true,
     ),
@@ -61,7 +61,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '520a2c20da7f6ea212b3ee451b62a81884015312',
+            'reference' => 'dd4ba98f660f176b2086261a82a8f1d1a6dd2b13',
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(

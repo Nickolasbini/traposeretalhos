@@ -94,4 +94,20 @@ class PersonRoleController
                'message' => $message
           ]);
      }
+
+     public function getRolesData()
+     {
+          $personRoleObj = new PersonRole();
+          $rolesArray = json_decode($_SESSION['roles'], true);
+          $data = [];
+          foreach($rolesArray as $role){
+               $personRolesNumber = $personRoleObj->getPersonRolesNumber($role['id']);
+               $data[$role['roleName']] = $personRolesNumber;
+          }
+          return json_encode([
+               'success' => true,
+               'message' => 'data gathered',
+               'content' => $data
+          ]);
+     }
 }

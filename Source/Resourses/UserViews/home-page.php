@@ -1,20 +1,5 @@
 <?php $this->insert('user-header', ['title' => ucfirst(translate('homepage'))]) ?>
 
-<!--
-<iframe src="https://embed.waze.com/iframe?zoom=18&lat=-25.5916948&lon=-49.3986947&pin=1"
-  width="300" height="400"></iframe>
-
-  <iframe src="https://embed.waze.com/iframe?ul?q=595%20Archelau%20de%20Almeida%20Torres"
-  width="300" height="400"></iframe>
-
-<img id="jo" src="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw" target="_blank"> 
-
-<input type="hidden" name="image-url" value="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw">
-
-<img src="https://maps.googleapis.com/maps/api/staticmap?center=archelau+de+almeida+torres+595&amp;zoom=18&amp;size=600x300&amp;maptype=roadmap&amp;markers=color:red|label:H|-25.5916169,-49.3966099&amp;key=AIzaSyChHsH5OFnAtmXBqldHQDqQAKLYUX-hmhw"/>
--->
-
-
 <section class="top-user-announcement">
 	<div class="top-user-announcement-wrapper">
 		<div class="title-wrapper">
@@ -25,142 +10,7 @@
 				<a href="#" class="user-personal-page">
 					<img src="Source/Resourses/External/icons/browser.svg">
 				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
-				<h3 class="user-name">Victoria</h3>
-				<div class="top-user-rate">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
-				</div>
-				<h6 class="user-description">
-					Eu sou a Victoria, trabalho como costureira a 45 anos e meio, sei fazer de tudo!!
-				</h6>
-			</div>
-			<div class="top-user-card">
-				<a href="#" class="user-personal-page">
-					<img src="Source/Resourses/External/icons/browser.svg">
-				</a>
-				<img src="Source/Resourses/External/icons/account.svg" class="top-user-photo">
+				<img src="http://localhost/traposeretalhos/Source/Files/img/users/585c87f174214afac6a1f6cbf380ade5-1637055196.jpeg" class="top-user-photo">
 				<h3 class="user-name">Victoria</h3>
 				<div class="top-user-rate">
 					<img src="Source/Resourses/External/icons/rate-star.svg" class="rate-star">
@@ -180,8 +30,8 @@
 	<div class="professionals-data">
 		<?php $rolesData = json_decode(file_get_contents(TMPPATH['files'].'roles.txt'), true); ?>
 		<?php foreach($rolesData as $role){ ?>
-			<div class="professional-card">
-			<span class="professionals-number"><?= $role['total'] ?></span>
+			<div class="professional-card <?= $role['roleName'] ?>">
+			<span class="professionals-number"></span>
 			<img src="Source/Resourses/External/icons/<?= $role['iconUrl'] ?>">
 			<h3><?php echo ucfirst(translate($role['roleName'])) ?></h3>
 			<h6><?php echo ucfirst(translate($role['description'])) ?></h6>
@@ -193,6 +43,27 @@
 <?php $this->insert('user-footer') ?>
 
 <script type="text/javascript">
+
+	$(document).ready(function(){
+	    feedProfessionalsNumber();
+	});
+
+  function feedProfessionalsNumber(){
+  	  $.ajax({
+		     	url: 'personrole/getrolesdata',
+		  	  type: 'POST',
+		  	  dataType: 'JSON',
+		  	  success: function(response){
+		  	  	  if(response.success == true){
+		  	  	  	  var data = response.content;
+		  	  	  	  for(var roleName in data){
+		  	  	  	  	  $('.'+roleName).find('.professionals-number').text(data[roleName]);
+		  	  	  	  }
+		  	  	  }
+		  	  }
+		  });
+  }
+
 	function encodeImgtoBase64(element) {
       var img = element.files[0];
       var reader = new FileReader();
@@ -235,6 +106,8 @@
 		text-align: center;
 		min-width: 200px;
 		margin: 0 1% 0 1%;
+		margin: auto;
+		width: 250px;
 	}
 	.user-personal-page{
 		display: flex;
@@ -246,7 +119,7 @@
 	.top-user-photo{
 		height: 100px;
 		width: 100px;
-		border-radius: 5px;
+		border-radius: 100px;
 		margin-top: -20px;
 	}
 	.top-user-rate{
@@ -309,4 +182,15 @@
 	.professional-card > h6{
 		font-size: 20px;
 	}
+
+	  /* cards options */
+	  @media only screen and (max-width: 600px){
+		  	.professional-card{
+		  		  padding: 5%;
+		  		  margin-bottom: 15%;
+		  	}
+	  	  .professionals-data h6{
+	  	  	  font-size: 15px;
+	  	  }
+	  }
 </style>

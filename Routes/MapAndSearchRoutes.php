@@ -1,6 +1,7 @@
 <?php 
 use Source\Models\Person;
 use Source\Helpers\FunctionsClass;
+use Source\Controllers\StateController;
 
 $app->get('/search', function(){
 	$isLogged = FunctionsClass::isPersonLoggedIn();
@@ -43,5 +44,12 @@ $app->get('/search', function(){
 	// All two will have the possibility to search by address, city or state
 
 
+});
+
+$app->post('/state/search', function(){
+	$stateCt = new StateController();
+	$results = $stateCt->search();
+	echo $results;
+	return $results;
 });
 

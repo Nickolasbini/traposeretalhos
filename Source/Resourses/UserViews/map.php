@@ -56,7 +56,7 @@
 			<?php }} ?>
 			</div>
 
-			<div class="best-professional-group">
+			<div class="best-professional-group" style="display: none;">
 				<div class="left-filter-top" style="margin-top: 25px;">
 					<h5 style="margin: 10px 0 0 10px;"><?php echo ucfirst(translate('best professionals')); ?></h5>
 				</div>
@@ -67,12 +67,12 @@
 			<div class="upper-filter">
 				<h5><?php echo ucfirst(translate('filter by')); ?>:</h5>
 				<select class="filter-map-by">
-					<option value="city">city</option>
-					<option value="state">state</option>
-					<option value="country">country</option>
+					<option value="city"><?php echo ucfirst(translate('city')); ?></option>
+					<option value="state" selected="selected"><?php echo ucfirst(translate('state')); ?></option>
+					<option value="country"><?php echo ucfirst(translate('country')); ?></option>
 				</select>
-				<input id="search-field" type="text" placeholder="<?php echo ucfirst(translate('search')); ?>">
-				<img class="search-icon" src="<?= URL['iconsPath']; ?>search.svg">
+				<input id="search-field" type="text" value="Paraná">
+				<img class="search-icon" style="display: none;" src="<?= URL['iconsPath']; ?>search.svg">
 			</div>
 
 			<div class="map-wrapper">
@@ -115,6 +115,19 @@
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBU-TEmfQj4HU2Janr2QIECDF2ciY1HvRY"></script>
 	
 	<?php $this->insert('user-footer') ?>
+
+	<div id="modal1" class="modal">
+		<div class="modal-data content-of-modal">
+	    	<div class="modal-header">
+	        	<span class="close" title="<?php echo ucfirst(translate('close')) ?>">&times;</span>
+				<h2 class="modal-title center-text"><?php echo ucfirst(translate('choose an option')) ?></h2>
+			</div>
+			<div class="content-wrapper center-text itens-to-choose"></div>
+	    </div>
+	</div>
+	<?php include "Source/Resourses/Components/edit-comment-modal.php" ?>
+	<?php include "Source/Resourses/Components/edit-post-modal.php" ?>
+	<script src="Source/Resourses/JS-functions/modal.js"></script>
 </body>
 <link href="Source/Resourses/CSS/maps-view-css.css" rel="stylesheet"></link>
 <script>
@@ -282,7 +295,7 @@
 	}
 
 	// think here how to call again just to try to gather the new position
-	$('.reLocateMe').on('click', function(){
+	$('.reLocateMe > div').on('click', function(){
 		$.ajax({
 		  	url: 'updatecookies/usergeolocation',
 		  	type: 'POST',
@@ -315,8 +328,65 @@
 		feedProfessionalsOnMap(currentLocation.latitude, currentLocation.longitude);
 	});
 
-	function feedProfessionalsOnMap(latitude, longitude){
-		var onlyThisRoles = [];
+	let typingTimer;
+    let typingInterval = 800;
+    $('#search-field').on('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(fetchLocations, typingInterval);
+    });
+
+    function fetchLocations(){
+    	var valueToSearch = $('#search-field').val();
+    	if(valueToSearch == ''){
+    		return;
+    	}
+    	openLoader();
+    	$.ajax({
+		  	url: 'state/search',
+		  	type: 'POST',
+		  	dataType: 'JSON',
+		  	data: {criteria: 'name', value: valueToSearch},
+		  	success: function(response){
+		  		if(response.success == true){
+		  			var elements = response.content;
+		  			if(elements.length > 0){
+			  			// feed dropdown with tips
+			  			var html = '<select class="options-of-items-select">';
+			  			for(i = 0; i < elements.length; i++){
+			  				html += '<option class="items-to-be-chosen" data-name="'+elements[i]['name']+'" value="'+elements[i]['id']+'">'+elements[i]['name']+'</option>';
+			  			}
+			  			html += '</select>'; 
+			  			$('.itens-to-choose').html(html);
+			  			$('.itens-to-choose').append('<div class="confirm-the-selection">confirm</div>');
+			  			openModal('modal1');
+		  			}else{
+		  				openToast("<?php echo ucfirst(translate('nothing found')); ?>");
+		  			}
+		  		}
+		  	},
+		  	complete: function(){
+		  		openLoader(false);
+		  	}
+		});
+    }
+
+    $(document).on('change', '.itens-to-choose', function(){
+    	$(document).find('.confirm-the-selection').click();
+    });
+
+    $(document).on('click', '.confirm-the-selection', function(){
+    	closeModal();
+    	var itemChosenId   = $(document).find('.itens-to-choose > select').val();
+    	var itemChosenName = $(document).find('.itens-to-choose').find(':selected').attr('data-name');
+    	$('#search-field').val(itemChosenName);
+    	feedProfessionalsOnMap();
+    });
+
+	function feedProfessionalsOnMap(latitude = currentLocation.latitude, longitude = currentLocation.longitude){
+		openLoader();
+		var filterBy      = $('.filter-map-by').val();
+		var valueOfFilter = $('#search-field').val();
+ 		var onlyThisRoles = [];
 		var elementsOfCheckbox = $('.roleOption:checkbox:checked');
 		if(elementsOfCheckbox.length > 0){
 			elementsOfCheckbox.each(function(){
@@ -327,24 +397,34 @@
 		  	url: 'person/fetchprofessionalsformap',
 		  	type: 'POST',
 		  	dataType: 'JSON',
-		  	data: {onlyThisRoles: onlyThisRoles},
+		  	data: {onlyThisRoles: onlyThisRoles, filterBy: filterBy, value: valueOfFilter},
 		  	success: function(result){
-		  	    console.log(result);
-		  	    alert('he');
 		  		if(result.success == true){
-			  		content = result.content;
-			  		// In case all roles are selected
-			  		if(rolesToNotDisplay == null){
-			  			<?php foreach($roles as $role){ ?>
-				  			for(i = 0; i < content[<?= $role['id'] ?>].length; i++){
-				  				var professionalLatitude = content[<?= $role['id'] ?>][i]['latitude'];
-				  				var professionalLongitude = content[<?= $role['id'] ?>][i]['longitude'];
-				  				var distanceInKM = getDistanceFromLatLonInKm(latitude, longitude, professionalLatitude, professionalLongitude);
-				  				if(distanceInKM > parseToKM(radiusInMeters))
-				  					continue;
-				  				professionalsMarker.push(content[<?= $role['id'] ?>][i]);
-				  			}
-			  			<?php } ?>
+			  		var content = result.content;
+		  			if(content == false && result.followLocation == true){
+		  				openToast("<?php echo ucfirst(translate('no professionals found')); ?>");
+		  				var locationToGo = result.location
+		  				latitudeCookie  = locationToGo[0];
+		  				longitudeCookie = locationToGo[1];
+		  			}else{
+			  			// In case all roles are selected
+				  		if(rolesToNotDisplay == null){
+				  			<?php foreach($roles as $role){ ?>
+					  			for(i = 0; i < content[<?= $role['id'] ?>].length; i++){
+					  				var professionalLatitude = content[<?= $role['id'] ?>][i]['latitude'];
+					  				var professionalLongitude = content[<?= $role['id'] ?>][i]['longitude'];
+					  				var distanceInKM = getDistanceFromLatLonInKm(latitude, longitude, professionalLatitude, professionalLongitude);
+					  				if(distanceInKM > parseToKM(radiusInMeters))
+					  					continue;
+					  				professionalsMarker.push(content[<?= $role['id'] ?>][i]);
+					  			}
+				  			<?php } ?>
+				  		}
+				  		if(result.followLocation == true){
+			  				var locationToGo = result.location
+			  				latitudeCookie  = locationToGo[0];
+			  				longitudeCookie = locationToGo[1];
+				  		}
 			  		}
 		  		}
 		    },
@@ -354,6 +434,7 @@
 		    		longitude: longitude
 		    	}
 		    	initMap(true);
+		    	openLoader(false);
 		    }
 		});
 	}
@@ -368,9 +449,11 @@
             '<div id="content">' +
             '<div id="siteNotice">' +
             "</div>" +
-            '<img width=150px src="'+logo+'">' +
-            '<img width=150px src="'+rolesIcon[role - 1]+'">' +
+            '<img class="user-photo-map" width=150px src="'+logo+'">' +
+            '<div class="user-info">' +
+            '<img width=50px src="'+rolesIcon[role - 1]+'">' +
             '<span style="float: right; margin-top:10%; margin-right:10%;">'+score+'</span>' + 
+            '</div>' +
             '<h1 id="firstHeading" class="firstHeading">'+title+'</h1>' +
             '<div id="bodyContent">' +
             "<p><b>"+title+"</b>, is a "+description+"</p>" +
@@ -551,6 +634,89 @@
 	.km-calculator{
 		pointer-events: none;
 		opacity: 0.8;
+	}
+
+	#content{
+		width: 90%;
+		text-align: center;
+	}
+	.user-photo-map{
+		width: 100px;
+		height: 100px;
+		border-radius: 100px;
+	}
+	.user-info{
+		width: 90%;
+		justify-content: space-between;
+		display: flex;
+		margin: auto;
+	}
+	.user-info > img{
+		width: 50px;
+		height: 50px;
+	}
+	.user-info > span{
+		float: unset;
+		margin-top: unset;
+		margin-right: unset;
+	}
+	.all-professionals-title > h5{
+		font-size: 1.2em;
+		width: 90%;
+		margin: auto;
+	}
+	.roles-cards{
+		flex-wrap: wrap;
+	}
+	.card-of-role{
+		width: 50%;
+		margin: 5%;
+	}
+
+	.options-of-items-select{
+		border-radius: 10px;
+		height: 30px;
+		width: 300px;
+		text-align: center;
+		margin: 2%;
+		background: #ececec;
+		border: 1px solid #eee;
+	}
+	.confirm-the-selection{
+		cursor: pointer;
+	}
+	.confirm-the-selection: hover{
+		opacity: 0.8;
+	}
+
+	@media only screen and (max-width: 600px){
+		.master-div{
+			flex-direction: column;
+		}
+		.left-options{
+			width: 90%;
+			margin: auto;
+		}
+		.left-options > h4{
+			margin-left: 5px;
+		}
+		.right-options{
+			width: 90%;
+			margin: auto;
+		}
+		.map-legend{
+			height: 50px;
+			padding: 2px;
+		}
+		.map-legend-item{
+			font-size: 0.8em;
+		}
+		.reLocateMe > div{
+			height: 25px;
+			font-size: 0.8em;
+			width: 50%;
+			margin-top: 5%;
+		}
 	}
 
 /*

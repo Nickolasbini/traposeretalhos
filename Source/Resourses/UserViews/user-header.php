@@ -32,7 +32,19 @@
     			</label>
     		</div>
     	</div>
-			<ul class="user-menu-list">
+			<ul class="user-menu-list hidden-upper-menu">
+				<?php if(isset($_SESSION['pageURL'])){ ?>
+				<li title="<?php echo ucfirst(translate('see my personal page')) ?>">
+					<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/browser.svg">
+					<a href="/<?= URL['urlDomain'] ?>/<?= $_SESSION['pageURL'] ?>"><?php echo ucfirst(translate('my page')); ?></a>
+				</li>
+				<?php } ?>
+				<?php if(isset($_SESSION['personId'])){ ?>
+				<li title="<?php echo ucfirst(translate('see my messages')) ?>">
+					<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/message.webp">
+					<a href="/<?= URL['urlDomain'] ?>/messages"><?php echo ucfirst(translate('messages')); ?></a>
+				</li>
+				<?php } ?>
 				<?php if(isset($_SESSION['personId'])){ ?>
 				<li title="<?php echo ucfirst(translate('my favorites menu')) ?>">
 					<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/star.svg">
@@ -41,8 +53,8 @@
 				<?php } ?>
 				<?php if(isset($_SESSION['personId'])){ ?>
 					<li title="<?php echo ucfirst(translate('my account information')) ?>">
-						<img src="/<?= URL['urlDomain'] ?>/Source/Resourses/External/icons/account.svg">
-						<a href="/<?= URL['urlDomain'] ?>/myaccount"><?php echo ucfirst(translate('my account')); ?></a>
+						<img src="<?php echo isset($_SESSION['personPicURL']) ? $_SESSION['personPicURL'] : '/'.URL['urlDomain'].'/Source/Resourses/External/icons/account.svg'  ?>" style="border-radius: 30px;">
+						<a href="/<?= URL['urlDomain'] ?>/myaccount" style="font-weight: bold;"><?= $_SESSION['personName'] ?></a>
 					</li>
 				<?php } ?>
 				<li>
@@ -57,6 +69,7 @@
 					</a>
 				</li>
 			</ul>
+			<i id="upper-menu-dropdown" class="fas fa-bars"></i>
 		</div>
 
 		<div class="header-logo">
@@ -78,12 +91,14 @@
 			    <li id="map" title="<?php echo ucfirst(translate('search on the real time map')) ?>">
 			    	<a href="/<?= URL['urlDomain'] ?>/map"><?php echo ucfirst(translate('map')); ?></a>
 			    </li>
-			    <li id="tips" title="<?php echo ucfirst(translate('know the best of the art')) ?>">
+			    <li id="tips" style="display: none" title="<?php echo ucfirst(translate('know the best of the art')) ?>">
 			    	<a href="/<?= URL['urlDomain'] ?>/tips"><?php echo ucfirst(translate('tips')); ?></a>
 			    </li>
-			    <li id="courses" title="<?php echo ucfirst(translate('see your courses')) ?>">
-			    	<a href="/<?= URL['urlDomain'] ?>/courses"><?php echo ucfirst(translate('courses')); ?></a>
-			    </li>
+			    <?php if(ALL_FEATURES){ ?>
+				    <li id="courses" title="<?php echo ucfirst(translate('see your courses')) ?>">
+				    	<a href="/<?= URL['urlDomain'] ?>/courses"><?php echo ucfirst(translate('courses')); ?></a>
+				    </li>
+				<?php } ?>
 			    <?php if(isset($_SESSION['userRole']) && !is_null($_SESSION['userRole'])){ ?>
 				    <li id="posts" title="<?php echo ucfirst(translate('manage your posts')) ?>">
 				    	<a href="/<?= URL['urlDomain'] ?>/posts"><?php echo ucfirst(translate('posts')); ?></a>
@@ -94,12 +109,25 @@
 	</nav>
 </header>
 
-<div class="loader"></div>
-<div class="messager"></div>
+<div id="loader-overlay">
+	<div id="loader"></div>
+</div>
+<div id="messager" title="<?php echo ucfirst(translate('dismiss')); ?>"></div>
 
+<?php include "Source/Resourses/Components/loader.php" ?>
 <?php include "Source/Resourses/Components/confirmation-alert.php" ?>
+<?php include "Source/Resourses/Components/messager-toast.php" ?>
 
 <script type="text/javascript">
+	$( document ).ready(function() {
+	    var messageToDisplay = "<?php echo isset($_SESSION['messageToDisplay']) ? $_SESSION['messageToDisplay'] : false ?>";
+	    if(messageToDisplay != false){
+	    	openToast(messageToDisplay);
+	    	$.ajax({url: "refreshMessages"});
+	    }
+	});
+
+
 	var pageTitle = "<?php echo $title ?>";
 	pageTitle = pageTitle.toLowerCase();
 	setMenuSelectedOption();
@@ -138,8 +166,24 @@
   	    $('.dropdown-menu').toggleClass('opened-dropdown-menu');
     });
 
+    $('#upper-menu-dropdown').on('click', function(){
+    	$('.user-menu-list').toggleClass('hidden-upper-menu');
+    	$('.user-menu-list').toggleClass('fromTopToDown');
+    	$('.user-menu-list').toggleClass('generatingData');
+  	    $(this).toggleClass('menu-bar-oppened-for-upper-menu');
+    });
+
 	function capitalize(string) {
 	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	function goToHomePage(){
+		window.location.href = "/<?= URL['urlDomain']; ?>";
+	}
+
+	// check if text contains only empty spaces
+	function isValidText(text){
+		return text.replace(/\s/g, '').length;
 	}
 </script>
 
@@ -340,6 +384,10 @@
 			z-index:2;
 	}
 
+	#upper-menu-dropdown{
+		display: none;
+	}
+
 	@media only screen and (max-width: 600px){
 	  .sort{
 	  	padding-left: 0px;
@@ -353,7 +401,9 @@
 	  }
 	  .dropdown-menu li{
 	  	display: none;
-	  	height: 50px;
+	  	height: 30px;
+		width: 100px;
+		border-radius: 15px;
 	  }
 	  .opened-dropdown-menu{
 	  	height: 250px!important;
@@ -368,13 +418,18 @@
 	  #menu-icon-bar{
 	  	display: block!important;
 	  	position: absolute;
-			right: 10%;
-			margin-top: 5%;
+		right: 10%;
+		margin-top: 5%;
 	  }
 	  .menu-bar-oppened{
 	  	color: #fff;
 	  	transform: rotate(90deg);
-			transition: 0.2;
+		transition: 0.2;
+	  }
+	  .menu-bar-oppened-for-upper-menu{
+	  	color: #gray;
+	  	transform: rotate(90deg);
+		transition: 0.2s;
 	  }
 	  #menu-icon-bar:hover{
 	  	color: #fff;
@@ -387,5 +442,54 @@
 	  .dropdown-menu a{
 	  	font-size: 1.2em !important;
 	  }
+	  .header-items>ul>li{
+	  	text-align: center;
+	  }
+	    /* related to upper dropwdown menu */
+	    #upper-menu-dropdown{
+			display: block;
+			margin: 15px 15px 0 0;
+			z-index: 100;
+	    }
+	    #upper-menu-dropdown{
+	    	cursor: pointer;
+	    }
+	    .fromTopToDown{
+	  	    animation-name: fromUpToDown;
+		    animation-duration: 0.5s;
+	    }
+	   .user-menu-list{
+		  	width: 50%;
+			position: absolute;
+			right: 0;
+			display: flex;
+			flex-direction: column;
+			background: #fff;
+			top: 0;
+			margin-top: 0px;
+			margin-right: 0px;
+			padding: 20px;
+			border-radius: 15px 0 0 15px;
+			justify-content: space-around;
+			height: 250px;
+			z-index: 50;
+	    }
+		.user-menu-list > li{
+		  	padding: 15px;
+		}
+	    .user-menu-options{
+	    	position: fixed;
+	    	z-index: 49;
+	    }
+		.header-logo{
+		  	padding-top: 60px;
+		}
+	    .hidden-upper-menu{
+		    display: none!important;
+	    }
+	    @keyframes fromUpToDown {
+		    from {height: 0; opacity: 0;}
+		    to {height: 200px; opacity: 1;}
+		}
 	}
 </style>

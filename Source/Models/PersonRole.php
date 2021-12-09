@@ -83,4 +83,10 @@ class PersonRole extends DataLayer
 		->fetch(true);
 		return $personRoleObj ? $personRoleObj[0] : null;
 	}
+
+	public function getPersonRolesNumber($roleId)
+	{
+		$data = $this->find('role = '.$roleId)->count();
+		return $data;
+	}
 }

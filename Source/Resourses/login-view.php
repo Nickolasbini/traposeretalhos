@@ -36,11 +36,11 @@
 	<section class="login-form-section">
 		<h2><?php echo ucfirst(translate('enter in you account')); ?></h2>
 		<div class="login-wrapper">
-			<form class="login-form" method="post" action="login">
-				<input type="text" name="email" placeholder="<?php echo ucfirst(translate('email')) ?>">
-				<input type="password" name="password" placeholder="<?php echo ucfirst(translate('password')) ?>">
+			<div class="login-form" method="post" action="login">
+				<input class="email-input" type="text" name="email" placeholder="<?php echo ucfirst(translate('email')) ?>">
+				<input class="password-input" type="password" name="password" placeholder="<?php echo ucfirst(translate('password')) ?>">
 				<input class="submit-btn" type="submit" value="<?php echo ucfirst(translate('enter')) ?>">
-			</form>
+			</div>
 			<div class="login-additional-options">
 				<a href="login/retrievepassword"><?php echo ucfirst(translate('i forgot my password')) ?></a>
 				<a href="newaccount"><?php echo ucfirst(translate('create new account')) ?></a>
@@ -52,14 +52,48 @@
 
 </body>
 
+<div id="loader-overlay">
+	<div id="loader"></div>
+</div>
+<div id="messager" title="<?php echo ucfirst(translate('dismiss')); ?>"></div>
+<?php include "Source/Resourses/Components/loader.php" ?>
+<?php include "Source/Resourses/Components/messager-toast.php" ?>
+
 <script type="text/javascript">
 	$(document).ready(function() {
-	    var messages = "<?= isset($_SESSION['messages']) ? $_SESSION['messages'] : '' ?>";
-		if(messages !== ''){
-			alert(messages);
-			cleanSystemMessages();
-		}
+	    var messageToDisplay = "<?php echo isset($_SESSION['messageToDisplay']) ? $_SESSION['messageToDisplay'] : false ?>";
+	    if(messageToDisplay != false){
+	    	openToast(messageToDisplay);
+	    	$.ajax({url: "refreshMessages"});
+	    }
 	});
+
+	$('.submit-btn').on('click', function(){
+		openLoader();
+		var email = $('.email-input').val();
+		var password = $('.password-input').val();
+		var messageToDisplay = null;
+		var accessGranted = false;
+		$.ajax({
+			url: 'login',
+			type: 'POST',
+			data: {email: email, password: password},
+			dataType: 'JSON',
+			success: function(result){
+				accessGranted = result.success;
+				messageToDisplay = result.message;
+			},
+			complete: function(){
+				openLoader(false);
+				if(accessGranted == true){
+					goToHomePage();
+				}else{
+					openToast(messageToDisplay);
+				}
+			}
+		});
+	});
+
 	setLanguageOptions();
 	// sets the language to user choice
 	$('.language-selector').on('change', function(){
@@ -87,6 +121,10 @@
 			url: "systemmessages/clean",
 			type: 'post'
   		});
+	}
+
+	function goToHomePage(){
+		window.location.href = "/<?= URL['urlDomain']; ?>";
 	}
 
 </script>

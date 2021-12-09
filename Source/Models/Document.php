@@ -76,9 +76,9 @@ class Document extends DataLayer
 			$done = imagejpeg($source, $filePath);
 			if($done){
 				$response[] = [
-					'directory' => 'img',
-					'path'		=> TMPPATH['images'],
-					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$fileName,
+					'directory' => $dir,
+					'path'		=> $filePath,
+					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$dir.$fileName,
 					'name'		=> $fileName
 				];
 			}
@@ -131,7 +131,7 @@ class Document extends DataLayer
 				$response[] = [
 					'directory' => 'img',
 					'path'		=> TMPPATH['images'],
-					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$fileName,
+					'webPath'   => URL['webPath'].TMPPATH['imagesSystemPath'].$dir.$fileName,
 					'name'		=> $fileName
 				];
 			}
@@ -142,6 +142,7 @@ class Document extends DataLayer
 	}
 
 	// save documents from return of saveFiles method, which saves the file
+	// photo sent must be of type base64_encoded with the html tag on it: data:image/;base64
 	// and return its path
 	public function saveDocuments($photoToSave = null, $directoryName = null)
 	{
@@ -183,5 +184,42 @@ class Document extends DataLayer
 			'webPath' 	=> $this->getWebPath(),
 		];
 		return $elements;
+	}
+
+	public function fetchDefaultPhotoElement()
+	{
+		$documentObj = $this->find("name = :name", "name=defaultPersonalPageBackgroundPhotoOfSystem")->limit(1)->fetch(true);
+		if(!$documentObj){
+			return $this->createDefaultPersonalPageBackgroundPhoto();
+		}else{
+			return $documentObj[0]->getId();
+		}
+	}
+
+	// create the default personal page background photo
+	public function createDefaultPersonalPageBackgroundPhoto()
+	{
+		$documentObj = new Document();
+		$documentObj->setDirectory('img/default');
+		$documentObj->setPath(TMPPATH['images']);
+		$documentObj->setName('default-background.webp');
+		$documentObj->setWebPath(URL['webPath'].TMPPATH['imagesSystemPath'].'default/default-background.webp');
+		$saveResult = $documentObj->save();
+		if(!$saveResult){
+			$id = null;
+		}else{
+			$id = $documentObj->data->id;
+		}
+		return $id;
+	}
+
+	// remove the document obj and the physical file
+	public function removeDocument()
+	{
+		$pathToFile = $this->getPath() . $this->getName();
+		if(file_exists($pathToFile)){
+			unlink($pathToFile);
+		}
+		return $this->destroy();
 	}
 }

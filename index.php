@@ -7,6 +7,7 @@ use Source\Controllers\CountryController;
 use Source\Controllers\LanguageController;
 use Source\Controllers\PersonController;
 use Source\Controllers\PersonRoleController;
+use Source\Controllers\APIController;
 use Source\Helpers\FunctionsClass;
 
 // starts the session
@@ -28,6 +29,8 @@ require __DIR__ ."/Routes/PersonRoutes.php";
 require __DIR__ ."/Routes/PostFeedRoutes.php";
 require __DIR__ ."/Routes/MapAndSearchRoutes.php";
 require __DIR__ ."/Routes/ViewsRoutes.php";
+require __DIR__ ."/Routes/MessageRoutes.php";
+require __DIR__ ."/Routes/PersonActivityRoutes.php";
 
 $app->get('/', function(){
 	$userTemplate = new League\Plates\Engine('Source/Resourses/UserViews');
@@ -116,6 +119,16 @@ $app->post('/updatecookies/usergeolocation', function(){
 	setcookie('longitude', $longitude, time() + (86400 * 30), '/');
 	// fetch on API results from this latitude and longitude to gather data
 	FunctionsClass::updateSessionUserLocation($latitude, $longitude);
+	if(FunctionsClass::isPersonLoggedIn()){
+		$personCt = new PersonController;
+		$dataToUpdate = [
+			'id'		=> $_SESSION['personId'],
+			'latitude'  => $latitude,
+			'longitude' => $longitude
+		];
+		$_POST['accountData'] = $dataToUpdate;
+		$personCt->save();
+	}
 	return true;
 });
 
@@ -123,6 +136,22 @@ $app->post('/updatecookies/usergeolocation', function(){
 $app->post('/systemmessages/clean', function(){
 	unset($_SESSION['messages']);
 	return true;
+});
+
+// search at API
+$app->post('/apicontroller/getdatafromlocationiq', function(){
+	$apiControllerCt = new APIController();
+	$result = $apiControllerCt->getDataFromLocationIQ();
+	echo $result;
+	return;
+});
+
+// get data related to number of professionals for each roles 
+$app->post('/personrole/getrolesdata', function(){
+	$personRoleCt = new PersonRoleController();
+	$result = $personRoleCt->getRolesData();
+	echo $result;
+	return;
 });
 
 $app->post('/save/map', function(){
@@ -153,6 +182,13 @@ $app->post('/save/map', function(){
 	return true;
 });
 
+$app->get('/refreshMessages', function(){
+	if(isset($_SESSION['messageToDisplay'])){
+		$_SESSION['messageToDisplay'] = null;
+	}
+	return;
+});
+
 $app->post('/me/test', function(){
 
 
@@ -176,4 +212,6 @@ if(!Midleware::checkLogin()){
 }
 // saves a history containing the last accessed route and the current one
 Midleware::saveLastRoute();
+// check what to show accordingly to ALL_FEATURES attribute
+Midleware::checkAvaliableFeatures();
 $app->run();

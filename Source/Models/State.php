@@ -90,4 +90,15 @@ class State extends DataLayer
 		$stateObj = $this->find("name = :stateName", "stateName=$stateName")->limit(1)->fetch();
 		return $stateObj;
 	}
+
+	public function search($criteria, $value, $limit = 10)
+	{
+		$results = null;
+		switch($criteria){
+			case 'name':
+				$results = $this->find("name like '%$value%'")->limit($limit)->fetch(true);
+			break;
+		}
+		return $results;
+	}
 }
