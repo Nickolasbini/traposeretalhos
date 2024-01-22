@@ -22,7 +22,7 @@ Plataforma de Marketplace e marketing digital para prestadores de servi√ßos da √
 # Traposeretalhos
 Marketplace and digital marketing platform for fabric service providers.
 
-## Funcionalidades
+## Functionalities
  - INTEGRATED MAP Dynamic and automated map.
  - GEOLOCATION Automatically finds the user with their location.
  - INTERACTIVE MAP Map that allows you to zoom and view nearby areas.
