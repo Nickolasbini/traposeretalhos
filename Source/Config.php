@@ -22,8 +22,8 @@ if(!PRODUCTION){
     define("MAIL_CONFIGURATION", [
         "host"=>"smtp.gmail.com",
         "port"=>"587",
-        "user"=>"nciwebsolution@gmail.com",
-        "passwd"=>"vin@!gard",
+        "user"=>"mail",
+        "passwd"=>"pass",
         "fromName"=>"NCI_WebSolutions",
         "fromMail"=>"nciwebolution@gmail.com",
         "AltBody"=>"Nci webSolutions"
