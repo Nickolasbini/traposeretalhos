@@ -21,7 +21,7 @@ class APIController
 		$_SESSION['usedLocationIQAPI'] = true;
 		$ch = curl_init();
 		$urlEncodedAddress = urlencode($address);
-		$url = 'https://eu1.locationiq.com/v1/search.php?key=pk.b01ea7ce0a6525f9512874eec8216720&q='.$urlEncodedAddress.'&format=json';
+		$url = 'https://eu1.locationiq.com/v1/search.php?key=placeholder_of_key&q='.$urlEncodedAddress.'&format=json';
 		curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/32.0.1700.107 Chrome/32.0.1700.107 Safari/537.36');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
